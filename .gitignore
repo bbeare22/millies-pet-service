@@ -1,0 +1,17 @@
+# dependencies
+node_modules
+.next
+out
+dist
+
+# local env files
+.env
+.env.local
+.env.development
+.env.production
+
+# database
+prisma/dev.db
+
+# system
+.DS_Store

@@ -1,0 +1,112 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: 255 255 255;
+  --fg: 17 24 39;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  color: rgb(var(--fg));
+  background: rgb(var(--bg));
+}
+
+.container {
+  @apply mx-auto px-4 max-w-6xl;
+}
+
+.btn {
+  @apply inline-flex items-center justify-center rounded-2xl px-4 py-2 text-sm font-semibold shadow-sm bg-brand text-white hover:bg-brand-dark transition;
+}
+
+.card {
+  @apply rounded-2xl border border-gray-200 shadow-sm p-6 bg-white;
+}
+
+.input {
+  @apply block w-full rounded-xl border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand;
+}
+
+.label {
+  @apply text-sm font-medium text-gray-700;
+}
+
+/* Buttons */
+.btn {
+  @apply inline-flex items-center justify-center rounded-2xl px-4 py-2 text-sm font-semibold shadow-sm
+         bg-brand text-white hover:bg-brand-dark transition-colors duration-150;
+}
+.btn-ghost {
+  @apply inline-flex items-center justify-center rounded-2xl px-4 py-2 text-sm font-semibold
+         border border-brand text-brand hover:bg-brand/10 transition-colors duration-150;
+}
+
+/* Nav links */
+.nav-link {
+  @apply px-3 py-1.5 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-100 transition;
+}
+.nav-link-active {
+  @apply bg-gray-100 font-semibold text-brand-dark;
+}
+
+/* Better focus outlines */
+:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(123, 108, 87, 0.35); /* brand brown */
+  border-radius: 0.5rem;
+}
+
+/* Hero watermark: subtle paw pattern */
+.hero-watermark {
+  /* light gradient + paw-print pattern using a tiny inline SVG */
+  background: radial-gradient(
+      1200px 400px at 40% 0%,
+      rgba(148, 181, 180, 0.1),
+      rgba(148, 181, 180, 0) 50%
+    ),
+    url("data:image/svg+xml;utf8,\
+<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 64 64' opacity='0.08'>\
+<rect width='64' height='64' fill='none'/>\
+<g fill='%237B6C57'>\
+<circle cx='18' cy='18' r='4'/>\
+<circle cx='30' cy='14' r='4'/>\
+<circle cx='42' cy='18' r='4'/>\
+<path d='M46 42c0 6-6 10-14 10S18 48 18 42s6-8 14-8 14 2 14 8z'/>\
+</g></svg>");
+  background-repeat: no-repeat, repeat;
+  background-size: cover, 320px 320px;
+}
+
+/* Card subtle elevation */
+.card {
+  @apply rounded-2xl border border-gray-200 bg-white shadow-[0_1px_2px_rgba(0,0,0,0.03)];
+}
+
+/* Respect iOS safe areas for sticky header/footer */
+header,
+footer {
+  padding-left: max(1rem, env(safe-area-inset-left));
+  padding-right: max(1rem, env(safe-area-inset-right));
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Improve long-word wrapping on small screens */
+p,
+li {
+  overflow-wrap: anywhere;
+}
