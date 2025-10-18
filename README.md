@@ -1,48 +1,112 @@
-# Paws & Paths — Dog Walking Website (Next.js + Prisma)
+# 🐾 Millie's Pet Service
 
-A professional, bookable website for a dog-walking business. Includes:
-- Services & Pricing
-- Availability preview
-- Booking form with email + SMS owner notification (SMTP + Twilio)
-- Prisma + SQLite for data storage
+A modern, mobile-friendly booking website for **Millie’s Pet Service** — a local dog walking and pet care business.  
+Customers can browse services, check pricing and availability, and request bookings directly from the site with instant email/text notifications for the owner.
 
-## Quick Start
+![Millie's Pet Service Preview](public/millies-logo.png)
 
-```bash
-# 1) Clone and install
-pnpm i   # or npm i / yarn
+---
 
-# 2) Configure env
-cp .env.example .env
-# Edit .env with your SMTP + Twilio details (or skip SMS/email during local dev).
+## 🌟 Features
 
-# 3) Setup DB
-npx prisma generate
-npx prisma db push
-npm run seed
+- 📱 **Responsive Design** — looks great on phones, tablets, and desktops  
+- 🗓️ **Online Booking Form** — customers can request walks or overnight stays  
+- 💬 **Email + SMS Notifications** — real-time updates for new bookings  
+- 💾 **Prisma + SQLite (Postgres-ready)** — persistent data storage  
+- 🎨 **TailwindCSS Styling** — clean, modern, and accessible design  
+- 🐶 **Sticky Mobile “Book Now” Bar** — easy one-tap booking on phones  
+- 🔒 **Environment-based Config** — safe credentials and database separation  
 
-# 4) Run dev
-npm run dev
+---
+
+## 🧰 Tech Stack
+
+- **Framework:** [Next.js 14](https://nextjs.org) (App Router)  
+- **Styling:** [TailwindCSS](https://tailwindcss.com)  
+- **ORM:** [Prisma](https://www.prisma.io/)  
+- **Database:** SQLite (local) → Postgres or Turso (production)  
+- **Email/SMS:** Nodemailer + Twilio (optional)  
+- **Deployment:** [Vercel](https://vercel.com)  
+
+---
+
+## 🚀 Local Setup
+
+1. **Clone the repo**
+   ```bash
+   git clone https://github.com/YOUR_USERNAME/millies-pet-service.git
+   cd millies-pet-service
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Set up your environment**
+   ```bash
+   cp .env.example .env
+   ```
+   Update `.env` with your local database and any email/SMS credentials.
+
+4. **Generate and seed Prisma**
+   ```bash
+   npx prisma generate
+   npx prisma db push
+   npm run seed
+   ```
+
+5. **Run the dev server**
+   ```bash
+   npm run dev
+   ```
+   Visit → [http://localhost:3000](http://localhost:3000)
+
+---
+
+## 🧑‍💻 Project Structure
+
+```
+.
+├── app/                  # Next.js app router pages
+├── components/           # Reusable UI components
+│   ├── Nav.tsx
+│   ├── Footer.tsx
+│   ├── BookingForm.tsx
+│   └── StickyBookBar.tsx
+├── prisma/               # Database schema and seed
+├── public/               # Static assets (logo, favicon, images)
+└── styles/               # Global styles (Tailwind)
 ```
 
-Open http://localhost:3000
+---
 
-## Deploy
-- **Render** or **Vercel** works well. For Vercel, switch to Postgres (Neon/Planetscale) or use Turso/LibSQL.
-- Set env vars in the hosting dashboard: `DATABASE_URL`, SMTP + Twilio vars.
+## 📦 Deployment
 
-## Customizing
-- Update branding in `.env` keys `NEXT_PUBLIC_SITE_*`
-- Edit services in `prisma/seed.js` or via DB.
-- Update social links in `components/Footer.tsx`
-- Replace public/logo.svg
+1. Push the repository to **GitHub**
+2. Connect it to **Vercel**
+3. Add environment variables:
+   - `DATABASE_URL`
+   - `SMTP_*` or `TWILIO_*` (optional)
+4. Deploy — Vercel will auto-build and host the site.
 
-## Notifications
-- Email uses Nodemailer with your SMTP. (Providers: Mailgun, Brevo, Resend (SMTP), SendGrid)
-- SMS uses Twilio. If you don't want SMS, omit those env vars and the route will skip it.
+---
 
-## Roadmap
-- Admin login to confirm/cancel bookings
-- Real calendar with blocked-out slots
-- Stripe payments and deposits
-- Reviews/testimonials
+## 💡 Roadmap
+
+- [ ] Add owner dashboard for managing bookings  
+- [ ] Integrate Google Calendar sync  
+- [ ] Add image gallery & testimonials  
+- [ ] Deploy production DB (Neon or Turso)  
+- [ ] SEO + analytics polish  
+
+---
+
+## 📄 License
+
+MIT © 2025 — Developed by [Brett Beare](https://github.com/bbeare22)  
+Designed for **Millie’s Pet Service** 🐾
+
+---
+
+### 🐕 “Because every tail deserves a happy wag.”
