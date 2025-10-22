@@ -34,7 +34,7 @@ Customers can browse services, check pricing and availability, and request booki
 
 1. **Clone the repo**
    ```bash
-   git clone https://github.com/YOUR_USERNAME/millies-pet-service.git
+   git clone https://github.com/bbeare22/millies-pet-service.git
    cd millies-pet-service
    ```
 
