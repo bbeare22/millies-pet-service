@@ -15,10 +15,10 @@ type Mode = 'walks' | 'overnight';
 const walks: WeeklySchedule = {
   0: [{ start: '06:30', end: '21:00' }], // Sun
   1: [{ start: '06:30', end: '21:00' }], // Mon
-  2: [{ start: '18:00', end: '23:59' }], // Tue
-  3: [{ start: '18:00', end: '23:59' }], // Wed
-  4: [{ start: '18:00', end: '23:59' }], // Thu
-  5: [{ start: '18:00', end: '23:59' }], // Fri
+  2: [{ start: '18:00', end: '21:00' }], // Tue
+  3: [{ start: '18:00', end: '21:00' }], // Wed
+  4: [{ start: '18:00', end: '21:00' }], // Thu
+  5: [{ start: '18:00', end: '21:00' }], // Fri
   6: [{ start: '06:30', end: '21:00' }], // Sat
 };
 

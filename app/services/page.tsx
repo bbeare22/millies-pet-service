@@ -1,22 +1,17 @@
-import { prisma } from '@/lib/prisma';
-import ServiceCard from '@/components/ServiceCard';
-import Link from 'next/link';
+import ServiceList from '@/components/ServiceList';
 
 export const metadata = { title: 'Services & Pricing' };
 
-export default async function ServicesPage() {
-  const services = await prisma.service.findMany({ where: { isActive: true }, orderBy: { priceCents: 'asc' } });
+export default function ServicesPage() {
   return (
-    <div className="py-10 space-y-6">
-      <h1 className="text-3xl font-bold">Services & Pricing</h1>
-      <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-        {services.map(s => (
-          <ServiceCard key={s.id} name={s.name} description={s.description} priceCents={s.priceCents} durationMin={s.durationMin} />
-        ))}
+    <section className="py-10 md:py-12">
+      <div className="container space-y-6">
+        <h1 className="text-3xl md:text-4xl font-extrabold">Services & Pricing</h1>
+        <p className="text-gray-700">
+          Select 1 or 2 dogs to preview pricing for walks and overnight services.
+        </p>
+        <ServiceList />
       </div>
-      <div>
-        <Link href="/book" className="btn mt-4 inline-block">Book Now</Link>
-      </div>
-    </div>
+    </section>
   );
 }
