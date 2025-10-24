@@ -1,5 +1,4 @@
 import AvailabilityCalendar from '@/components/AvailabilityCalendar';
-
 export const metadata = { title: 'Availability' };
 
 export default function AvailabilityPage() {
@@ -8,11 +7,10 @@ export default function AvailabilityPage() {
       <div className="container space-y-6">
         <h1 className="text-3xl md:text-4xl font-extrabold">Availability</h1>
         <p className="text-gray-700">
-          Tap a date to see open times. Tue–Fri evenings; Sat–Sun–Mon daytime.
+          Choose a mode (Walks & Drop-ins vs Overnight). Tap a date to see open times.
         </p>
         <AvailabilityCalendar />
       </div>
     </section>
   );
 }
-
