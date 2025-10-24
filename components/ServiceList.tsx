@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import Link from 'next/link';
 
 type Service = {
   id: number;
@@ -78,7 +79,7 @@ export default function ServiceList() {
 
   return (
     <div className="space-y-10">
-      {/* Toggle */}
+      {/* Header + 2-dog toggle */}
       <div className="flex items-center justify-between gap-3">
         <h2 className="text-xl md:text-2xl font-extrabold">Services & Pricing</h2>
         <div className="flex items-center gap-2">
@@ -115,11 +116,16 @@ export default function ServiceList() {
                     <span className="text-xs text-gray-500">{s.durationMin} min</span>
                   )}
                 </div>
+                {/* CTAs */}
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <Link className="btn" href={`/book?serviceId=${s.id}`}>Book 1 dog</Link>
+                  <Link className="btn-ghost" href={`/book?serviceId=${s.id}&dogs=2`}>Book 2 dogs</Link>
+                </div>
               </article>
             ))}
           </div>
           <p className="text-xs text-gray-500">
-            Walk prices reflect your selection (1 or 2 dogs). Two-dog pricing: 20m $25.50 • 30m $39.00 • 60m $48.00.
+            Two-dog walk pricing: 20m $25.50 • 30m $39.00 • 60m $48.00.
           </p>
         </section>
       )}
@@ -139,6 +145,9 @@ export default function ServiceList() {
                     <span className="text-xs text-gray-500">{s.durationMin} min</span>
                   )}
                 </div>
+                <div className="mt-4">
+                  <Link className="btn" href={`/book?serviceId=${s.id}`}>Book Now</Link>
+                </div>
               </article>
             ))}
           </div>
@@ -156,15 +165,17 @@ export default function ServiceList() {
                 {s.description && <p className="mt-1 text-sm text-gray-600">{s.description}</p>}
                 <div className="mt-3 flex items-center justify-between">
                   <span className="font-semibold">${(displayPriceCents(s, dogs) / 100).toFixed(2)}</span>
-                  {s.durationMin > 0 && (
-                    <span className="text-xs text-gray-500">overnight</span>
-                  )}
+                  {s.durationMin > 0 && <span className="text-xs text-gray-500">overnight</span>}
+                </div>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <Link className="btn" href={`/book?serviceId=${s.id}`}>Book 1 dog</Link>
+                  <Link className="btn-ghost" href={`/book?serviceId=${s.id}&dogs=2`}>Book 2 dogs</Link>
                 </div>
               </article>
             ))}
           </div>
           <p className="text-xs text-gray-500">
-            Boarding adds $18 per additional dog (up to 3). Sitting adds $23 per additional dog. Prices reflect your 1-or-2 dog selection here.
+            Boarding adds $18 per extra dog (up to 3). Sitting adds $23 per extra dog.
           </p>
         </section>
       )}
@@ -180,7 +191,9 @@ export default function ServiceList() {
                 {s.description && <p className="mt-1 text-sm text-gray-600">{s.description}</p>}
                 <div className="mt-3 flex items-center justify-between">
                   <span className="font-semibold">${(s.priceCents / 100).toFixed(2)}</span>
-                  {/* duration hidden for add-ons */}
+                </div>
+                <div className="mt-4">
+                  <Link className="btn" href={`/book?serviceId=${s.id}`}>Book Now</Link>
                 </div>
               </article>
             ))}

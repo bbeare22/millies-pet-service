@@ -27,6 +27,12 @@ export default function BookingForm() {
   const [startDate, setStartDate] = useState('');
   const [startTime, setStartTime] = useState('');
 
+  // Prefill from URL
+  const prefillServiceId = params.get('serviceId');
+  const prefillDogs = params.get('dogs'); // "1" | "2"
+  const prefillDate = params.get('date');
+  const prefillTime = params.get('time');
+
   useEffect(() => {
     (async () => {
       try {
@@ -34,36 +40,37 @@ export default function BookingForm() {
         const data = await res.json();
         const list = (data.services || []) as Service[];
         setServices(list);
-        if (list.length && serviceId == null) setServiceId(list[0].id);
+
+        // Decide initial service
+        let initialServiceId: number | null = null;
+        if (prefillServiceId) {
+          const parsed = Number(prefillServiceId);
+          if (Number.isFinite(parsed) && list.some((s) => s.id === parsed)) {
+            initialServiceId = parsed;
+          }
+        }
+        if (initialServiceId == null && list.length) {
+          initialServiceId = list[0].id;
+        }
+        setServiceId(initialServiceId);
+
+        // Prefill dogs/date/time
+        if (prefillDogs === '2') setPetCount(2);
+        if (prefillDate) setStartDate(prefillDate);
+        if (prefillTime) setStartTime(prefillTime);
       } finally {
         setLoading(false);
       }
     })();
-  }, []);
-
-  // Prefill from calendar (?date=YYYY-MM-DD&time=HH:mm)
-  useEffect(() => {
-    const d = params.get('date');
-    const t = params.get('time');
-    if (d) setStartDate(d);
-    if (t) setStartTime(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  // helpers
-  function combineDateTime(date: string, time: string) {
-    if (!date || !time) return null;
-    const iso = new Date(`${date}T${time}`);
-    if (Number.isNaN(iso.getTime())) return null;
-    return iso.toISOString();
-  }
 
   const selectedService = useMemo(
     () => services.find((s) => s.id === serviceId) || null,
     [services, serviceId]
   );
 
-  // classify service names
+  // Classification helpers
   function isWalk(s: Service | null) {
     return !!s?.name.startsWith('Dog Walk');
   }
@@ -73,64 +80,72 @@ export default function BookingForm() {
   function isOvernightSitting(s: Service | null) {
     return !!s?.name.startsWith('Sitting');
   }
+  function isAddon(s: Service | null) {
+    return !!s && (s.durationMin ?? 0) === 0 && !isOvernightBoarding(s) && !isOvernightSitting(s);
+  }
   function isPottyBreak(s: Service | null) {
     return !!s?.name.startsWith('Potty Break');
   }
-  function isAddon(s: Service | null) {
-    return !!s && (s.durationMin ?? 0) === 0;
-  }
 
-  // pet selector visibility + limits
+  // Show pet selector for Walks & Overnight
   const showPetSelector = useMemo(() => {
     if (!selectedService) return false;
     return isWalk(selectedService) || isOvernightBoarding(selectedService) || isOvernightSitting(selectedService);
   }, [selectedService]);
 
+  // Pet limits
   const maxPets = useMemo(() => {
     if (!selectedService) return 1;
-    if (isWalk(selectedService)) return 2; // capped at 2 (special pricing given)
-    if (isOvernightBoarding(selectedService)) return 4; // “up to 3 additional”
-    if (isOvernightSitting(selectedService)) return 4; // reasonable default
+    if (isWalk(selectedService)) return 2; // walks: cap at 2
+    if (isOvernightBoarding(selectedService)) return 4; // 1 base + up to 3 extra
+    if (isOvernightSitting(selectedService)) return 4;
     return 1;
   }, [selectedService]);
 
   useEffect(() => {
     if (petCount > maxPets) setPetCount(maxPets);
     if (petCount < 1) setPetCount(1);
-  }, [maxPets]); // adjust when switching services
+  }, [maxPets]); // adjust on service change
 
-  // price calculation
+  // Price calculation
   function computeTotalCents(s: Service | null, pets: number): number {
     if (!s) return 0;
 
-    // Walks: 2-dog special prices
+    // Walks: special 2-dog prices
     if (isWalk(s)) {
       if (pets <= 1) return s.priceCents;
-      // duration in name: "(20 min)", "(30 min)", "(60 min)"
       if (s.name.includes('(20')) return 2550;
       if (s.name.includes('(30')) return 3900;
       if (s.name.includes('(60')) return 4800;
-      return s.priceCents; // fallback
+      return s.priceCents;
     }
 
-    // Overnight boarding: $25 + $18 per extra (up to 3 additional)
+    // Overnight – Boarding: $25 + $18/extra (up to 3)
     if (isOvernightBoarding(s)) {
       const extras = Math.max(0, Math.min(pets - 1, 3));
       return 2500 + extras * 1800;
     }
 
-    // Overnight sitting: $30 + $23 per extra
+    // Overnight – Sitting: $30 + $23/extra
     if (isOvernightSitting(s)) {
       const extras = Math.max(0, pets - 1);
       return 3000 + extras * 2300;
     }
 
-    // Potty breaks & add-ons: flat
+    // Potty Breaks & Add-ons: flat
     return s.priceCents;
   }
 
   const totalCents = computeTotalCents(selectedService, petCount);
   const totalDisplay = `$${(totalCents / 100).toFixed(2)}`;
+
+  // Helpers
+  function combineDateTime(date: string, time: string) {
+    if (!date || !time) return null;
+    const iso = new Date(`${date}T${time}`);
+    if (Number.isNaN(iso.getTime())) return null;
+    return iso.toISOString();
+  }
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -145,20 +160,19 @@ export default function BookingForm() {
     const form = e.currentTarget as HTMLFormElement;
     const fd = new FormData(form);
 
-    // stitch notes with a pets line so the API stores it even if it ignores custom fields
     const baseNotes = String(fd.get('notes') || '').trim();
     const petsLine = `Pets: ${petCount}${selectedService ? ` (${selectedService.name})` : ''}. Estimated total: ${totalDisplay}.`;
     const notes = baseNotes ? `${baseNotes}\n${petsLine}` : petsLine;
 
     const payload = {
-      serviceId,                                 // number | null
+      serviceId,
       customerName: fd.get('customerName'),
       email: fd.get('email'),
       phone: fd.get('phone'),
       start: startISO,
       notes,
-      petCount,                                  // extra info (server can ignore safely)
-      estimatedTotalCents: totalCents,           // extra info
+      petCount,
+      estimatedTotalCents: totalCents,
     };
 
     try {
@@ -169,7 +183,6 @@ export default function BookingForm() {
         body: JSON.stringify(payload),
       });
 
-      // don’t crash UX if body isn’t JSON
       try {
         await res.json();
       } catch {}
@@ -216,7 +229,7 @@ export default function BookingForm() {
         )}
       </div>
 
-      {/* Pets (only for Walks/Overnights) */}
+      {/* Pets (Walks & Overnight only) */}
       {showPetSelector && (
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
@@ -232,10 +245,14 @@ export default function BookingForm() {
               ))}
             </select>
             {isWalk(selectedService) && (
-              <p className="mt-1 text-xs text-gray-600">Walks support up to 2 dogs with special 2-dog pricing.</p>
+              <p className="mt-1 text-xs text-gray-600">
+                Walks support up to 2 dogs with special 2-dog pricing.
+              </p>
             )}
             {isOvernightBoarding(selectedService) && (
-              <p className="mt-1 text-xs text-gray-600">Up to 3 additional dogs. Pets must be picked up by 11:59pm.</p>
+              <p className="mt-1 text-xs text-gray-600">
+                Up to 3 additional dogs. Pets must be picked up by 11:59pm.
+              </p>
             )}
           </div>
         </div>
