@@ -1,11 +1,13 @@
+import { Suspense } from 'react';
 import AdminBookingsClient from '@/components/AdminBookingsClient';
 
 export const metadata = {
   title: 'Admin · Bookings',
 };
 
+export const dynamic = 'force-dynamic';
+
 export default function AdminPage() {
-  // The table and actions are in a client component for interactivity
   return (
     <div className="py-10 space-y-6">
       <div className="flex items-center justify-between">
@@ -14,7 +16,10 @@ export default function AdminPage() {
           <button className="btn-ghost" type="submit">Log out</button>
         </form>
       </div>
-      <AdminBookingsClient />
+
+      <Suspense fallback={<p>Loading…</p>}>
+        <AdminBookingsClient />
+      </Suspense>
     </div>
   );
 }
