@@ -9,7 +9,7 @@ export default function ContactPage() {
         Call or text: <a className="underline" href="tel:+17197614151">(719) 761-4151</a>
       </p>
       <p className="text-gray-700">
-        Email: <a className="underline" href="mailto:milliespetserv@gmail.com">milliespetserv@gmail.com</a>
+        Email: <a className="underline" href="mailto:mpetserv@gmail.com">mpetserv@gmail.com</a>
       </p>
       <p className="italic text-brand-dark font-heading mt-4">Love & Cuddles are FREE!</p>
     </div>

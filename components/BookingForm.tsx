@@ -1,10 +1,15 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 export default function BookingForm() {
   const router = useRouter();
+  const params = useSearchParams();
+
+  // Pull prefill values from query params
+  const prefillDate = params.get('date');
+  const prefillTime = params.get('time');
 
   const [services, setServices] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -64,12 +69,10 @@ export default function BookingForm() {
         body: JSON.stringify(payload)
       });
 
-      // If the API returns JSON, try to parse it (but don't crash the UX if it doesn't)
       let data: any = {};
       try { data = await res.json(); } catch {}
 
       if (res.ok) {
-        // Hard confirmation so users always see success
         router.push('/book/thank-you');
       } else {
         setMessage(data?.error || 'Something went wrong. Please try again.');
@@ -155,6 +158,7 @@ export default function BookingForm() {
               required
               className="input min-h-12"
               onFocus={scrollIntoViewCentered}
+              defaultValue={prefillDate || ''}
             />
           </div>
           <div>
@@ -166,6 +170,7 @@ export default function BookingForm() {
               required
               className="input min-h-12"
               onFocus={scrollIntoViewCentered}
+              defaultValue={prefillTime || ''}
             />
           </div>
         </div>
@@ -173,7 +178,13 @@ export default function BookingForm() {
 
       <div>
         <label className="label" htmlFor="notes">Notes (optional)</label>
-        <textarea id="notes" name="notes" className="input" rows={4} placeholder="Gate code, pup preferences, etc." />
+        <textarea
+          id="notes"
+          name="notes"
+          className="input"
+          rows={4}
+          placeholder="Gate code, pup preferences, etc."
+        />
       </div>
 
       <button className="btn w-full sm:w-auto" type="submit" disabled={submitting}>

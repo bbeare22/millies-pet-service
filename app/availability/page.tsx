@@ -1,4 +1,4 @@
-import AvailabilityClient from '@/components/AvailabilityClient';
+import AvailabilityCalendar from '@/components/AvailabilityCalendar';
 
 export const metadata = { title: 'Availability' };
 
@@ -8,12 +8,11 @@ export default function AvailabilityPage() {
       <div className="container space-y-6">
         <h1 className="text-3xl md:text-4xl font-extrabold">Availability</h1>
         <p className="text-gray-700">
-          Pick a day and time to start a booking. Availability is updated regularly.
+          Tap a date to see open times. Tue–Fri evenings; Sat–Sun–Mon daytime.
         </p>
-        <div className="card">
-          <AvailabilityClient />
-        </div>
+        <AvailabilityCalendar />
       </div>
     </section>
   );
 }
+
