@@ -108,7 +108,7 @@ export default function AvailabilityCalendar() {
       <div className="space-y-1">
         <h2 className="text-xl sm:text-2xl font-extrabold">Availability</h2>
         <p className="text-gray-700 text-sm sm:text-base">
-          Sat–Mon: 6:00am–8:30pm • Tue–Fri: 6:00pm–8:30pm. Pick a date to see open times.
+          Sat–Mon: 6:30am–8:30pm • Tue–Fri: 6:00pm–8:30pm. Pick a date to see open times.
         </p>
       </div>
 
