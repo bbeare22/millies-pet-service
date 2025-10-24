@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 const links = [
   { href: '/', label: 'Home' },
@@ -9,25 +9,12 @@ const links = [
   { href: '/availability', label: 'Availability' },
   { href: '/book', label: 'Book Now' },
   { href: '/contact', label: 'Contact' },
+  { href: '/admin', label: 'Admin' } 
 ];
 
 export default function Nav() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
-
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      try {
-        const res = await fetch('/api/admin/me', { cache: 'no-store' });
-        if (!cancelled) setIsAdmin(res.ok);
-      } catch {
-        if (!cancelled) setIsAdmin(false);
-      }
-    })();
-    return () => { cancelled = true; };
-  }, []);
 
   return (
     <header className="border-b border-gray-200 bg-white/70 backdrop-blur sticky top-0 z-50 overflow-hidden">
@@ -55,19 +42,6 @@ export default function Nav() {
               {l.label}
             </Link>
           ))}
-
-          {/* Admin (visible only after login) */}
-          {isAdmin && (
-            <Link
-              href="/admin"
-              className={`px-3 py-1.5 rounded-xl text-sm hover:bg-gray-100 transition ${
-                pathname.startsWith('/admin') ? 'bg-gray-100 font-semibold text-brand-dark' : ''
-              }`}
-              title="Admin dashboard"
-            >
-              Admin
-            </Link>
-          )}
         </nav>
 
         {/* Mobile Menu Button */}
@@ -94,26 +68,15 @@ export default function Nav() {
                 key={l.href}
                 href={l.href}
                 className={`px-3 py-3 rounded-xl text-base ${
-                  pathname === l.href ? 'bg-gray-100 font-semibold text-brand-dark' : 'hover:bg-gray-50'
+                  pathname === l.href
+                    ? 'bg-gray-100 font-semibold text-brand-dark'
+                    : 'hover:bg-gray-50'
                 }`}
                 onClick={() => setOpen(false)}
               >
                 {l.label}
               </Link>
             ))}
-
-            {/* Admin (mobile) */}
-            {isAdmin && (
-              <Link
-                href="/admin"
-                className={`px-3 py-3 rounded-xl text-base ${
-                  pathname.startsWith('/admin') ? 'bg-gray-100 font-semibold text-brand-dark' : 'hover:bg-gray-50'
-                }`}
-                onClick={() => setOpen(false)}
-              >
-                Admin
-              </Link>
-            )}
           </nav>
         </div>
       )}

@@ -1,11 +1,13 @@
 import { NextResponse } from 'next/server';
 
-export async function POST() {
-  const res = NextResponse.json({ ok: true });
-  res.cookies.set('admin_session', '', {
+const ADMIN_COOKIE = 'admin_session';
+
+export async function POST(req: Request) {
+  const res = NextResponse.redirect(new URL('/admin', req.url));
+  res.cookies.set(ADMIN_COOKIE, '', {
     httpOnly: true,
     sameSite: 'lax',
-    secure: process.env.NODE_ENV === 'production',
+    secure: process.env.NODE_ENV !== 'development',
     path: '/',
     maxAge: 0,
   });
