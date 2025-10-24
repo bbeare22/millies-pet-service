@@ -12,49 +12,127 @@ type Service = {
   isActive: boolean;
 };
 
+type Booking = {
+  id: number;
+  start: string; // ISO
+};
+
+/* ----------------- Weekly availability ------------------
+   Sat/Sun/Mon: 06:00–20:30
+   Tue–Fri:     18:00–20:30
+--------------------------------------------------------- */
+type TimeRange = { start: string; end: string };
+const WEEKLY: Record<number, TimeRange[]> = {
+  0: [{ start: '06:00', end: '20:30' }], // Sun
+  1: [{ start: '06:00', end: '20:30' }], // Mon
+  2: [{ start: '18:00', end: '20:30' }], // Tue
+  3: [{ start: '18:00', end: '20:30' }], // Wed
+  4: [{ start: '18:00', end: '20:30' }], // Thu
+  5: [{ start: '18:00', end: '20:30' }], // Fri
+  6: [{ start: '06:00', end: '20:30' }], // Sat
+};
+
+/* ------- Extra time windows (by service type) -----------
+   Drop-in (Potty Break): 06:30–20:30
+   Walk (Dog Walk):       08:00–19:00
+--------------------------------------------------------- */
+const EXTRA_WINDOWS: Record<'dropin'|'walk', TimeRange> = {
+  dropin: { start: '06:30', end: '20:30' },
+  walk:   { start: '08:00', end: '19:00' },
+};
+
+/* --------------------- helpers ------------------------- */
+function pad2(n: number) { return String(n).padStart(2, '0'); }
+function hhmm(date: Date) { return `${pad2(date.getHours())}:${pad2(date.getMinutes())}`; }
+
+function timeToMinutes(t: string) {
+  const [h, m] = t.split(':').map(Number);
+  return h * 60 + m;
+}
+function within(t: string, r: TimeRange) {
+  const x = timeToMinutes(t);
+  return x >= timeToMinutes(r.start) && x <= timeToMinutes(r.end);
+}
+function rangesToSlots(ranges: TimeRange[], stepMin = 30) {
+  const out: string[] = [];
+  for (const r of ranges) {
+    const start = new Date(2000, 0, 1, +r.start.slice(0, 2), +r.start.slice(3, 5));
+    const end   = new Date(2000, 0, 1, +r.end.slice(0, 2),   +r.end.slice(3, 5));
+    for (let t = new Date(start); t <= end; t.setMinutes(t.getMinutes() + stepMin)) {
+      out.push(hhmm(t));
+    }
+  }
+  return Array.from(new Set(out));
+}
+function getWeekday(dateStr: string) {
+  return new Date(`${dateStr}T00:00:00`).getDay(); // 0..6
+}
+function allowedTimeListForDate(dateStr: string) {
+  const wd = getWeekday(dateStr);
+  const ranges = WEEKLY[wd] || [];
+  return rangesToSlots(ranges, 30);
+}
+function classifyService(s: Service | null): 'walk' | 'dropin' | 'other' {
+  if (!s) return 'other';
+  if (s.name.startsWith('Dog Walk')) return 'walk';
+  if (s.name.startsWith('Potty Break')) return 'dropin';
+  return 'other';
+}
+function filterByServiceWindow(times: string[], sType: 'walk'|'dropin'|'other') {
+  if (sType === 'walk')   return times.filter(t => within(t, EXTRA_WINDOWS.walk));
+  if (sType === 'dropin') return times.filter(t => within(t, EXTRA_WINDOWS.dropin));
+  return times;
+}
+/* ------------------------------------------------------- */
+
 export default function BookingForm() {
   const router = useRouter();
   const params = useSearchParams();
 
+  // data
   const [services, setServices] = useState<Service[]>([]);
+  const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
-  const [submitting, setSubmitting] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
 
-  // form state
+  // form
   const [serviceId, setServiceId] = useState<number | null>(null);
   const [petCount, setPetCount] = useState(1);
   const [startDate, setStartDate] = useState('');
   const [startTime, setStartTime] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
 
-  // Prefill from URL
+  // Prefill
   const prefillServiceId = params.get('serviceId');
-  const prefillDogs = params.get('dogs'); // "1" | "2"
+  const prefillDogs = params.get('dogs');
   const prefillDate = params.get('date');
   const prefillTime = params.get('time');
 
   useEffect(() => {
     (async () => {
       try {
-        const res = await fetch('/api/services', { cache: 'no-store' });
-        const data = await res.json();
-        const list = (data.services || []) as Service[];
-        setServices(list);
+        const [svcRes, bRes] = await Promise.all([
+          fetch('/api/services', { cache: 'no-store' }),
+          fetch('/api/bookings', { cache: 'no-store' }),
+        ]);
+        const svcJson = await svcRes.json();
+        const bJson   = bRes.ok ? await bRes.json() : { bookings: [] };
 
-        // Decide initial service
-        let initialServiceId: number | null = null;
+        const list = (svcJson.services || []) as Service[];
+        setServices(list);
+        setBookings((bJson.bookings || []) as Booking[]);
+
+        // initial service
+        let initId: number | null = null;
         if (prefillServiceId) {
           const parsed = Number(prefillServiceId);
-          if (Number.isFinite(parsed) && list.some((s) => s.id === parsed)) {
-            initialServiceId = parsed;
+          if (Number.isFinite(parsed) && list.some(s => s.id === parsed)) {
+            initId = parsed;
           }
         }
-        if (initialServiceId == null && list.length) {
-          initialServiceId = list[0].id;
-        }
-        setServiceId(initialServiceId);
+        if (initId == null && list.length) initId = list[0].id;
+        setServiceId(initId);
 
-        // Prefill dogs/date/time
         if (prefillDogs === '2') setPetCount(2);
         if (prefillDate) setStartDate(prefillDate);
         if (prefillTime) setStartTime(prefillTime);
@@ -66,80 +144,74 @@ export default function BookingForm() {
   }, []);
 
   const selectedService = useMemo(
-    () => services.find((s) => s.id === serviceId) || null,
+    () => services.find(s => s.id === serviceId) || null,
     [services, serviceId]
   );
+  const serviceType = classifyService(selectedService);
 
-  // Classification helpers
-  function isWalk(s: Service | null) {
-    return !!s?.name.startsWith('Dog Walk');
-  }
-  function isOvernightBoarding(s: Service | null) {
-    return !!s?.name.startsWith('Boarding');
-  }
-  function isOvernightSitting(s: Service | null) {
-    return !!s?.name.startsWith('Sitting');
-  }
-  function isAddon(s: Service | null) {
-    return !!s && (s.durationMin ?? 0) === 0 && !isOvernightBoarding(s) && !isOvernightSitting(s);
-  }
-  function isPottyBreak(s: Service | null) {
-    return !!s?.name.startsWith('Potty Break');
-  }
-
-  // Show pet selector for Walks & Overnight
+  // pets visibility + limits
   const showPetSelector = useMemo(() => {
     if (!selectedService) return false;
-    return isWalk(selectedService) || isOvernightBoarding(selectedService) || isOvernightSitting(selectedService);
+    return selectedService.name.startsWith('Dog Walk')
+        || selectedService.name.startsWith('Boarding')
+        || selectedService.name.startsWith('Sitting');
   }, [selectedService]);
 
-  // Pet limits
   const maxPets = useMemo(() => {
     if (!selectedService) return 1;
-    if (isWalk(selectedService)) return 2; // walks: cap at 2
-    if (isOvernightBoarding(selectedService)) return 4; // 1 base + up to 3 extra
-    if (isOvernightSitting(selectedService)) return 4;
+    if (selectedService.name.startsWith('Dog Walk')) return 2;
+    if (selectedService.name.startsWith('Boarding')) return 4;
+    if (selectedService.name.startsWith('Sitting'))  return 4;
     return 1;
   }, [selectedService]);
 
   useEffect(() => {
     if (petCount > maxPets) setPetCount(maxPets);
     if (petCount < 1) setPetCount(1);
-  }, [maxPets]); // adjust on service change
+  }, [maxPets]);
 
-  // Price calculation
+  // price calc (same rules you had)
   function computeTotalCents(s: Service | null, pets: number): number {
     if (!s) return 0;
-
-    // Walks: special 2-dog prices
-    if (isWalk(s)) {
+    if (s.name.startsWith('Dog Walk')) {
       if (pets <= 1) return s.priceCents;
       if (s.name.includes('(20')) return 2550;
       if (s.name.includes('(30')) return 3900;
       if (s.name.includes('(60')) return 4800;
       return s.priceCents;
     }
-
-    // Overnight – Boarding: $25 + $18/extra (up to 3)
-    if (isOvernightBoarding(s)) {
+    if (s.name.startsWith('Boarding')) {
       const extras = Math.max(0, Math.min(pets - 1, 3));
       return 2500 + extras * 1800;
     }
-
-    // Overnight – Sitting: $30 + $23/extra
-    if (isOvernightSitting(s)) {
+    if (s.name.startsWith('Sitting')) {
       const extras = Math.max(0, pets - 1);
       return 3000 + extras * 2300;
     }
-
-    // Potty Breaks & Add-ons: flat
     return s.priceCents;
   }
-
   const totalCents = computeTotalCents(selectedService, petCount);
   const totalDisplay = `$${(totalCents / 100).toFixed(2)}`;
 
-  // Helpers
+  // allowed times for chosen date, intersected with service window
+  const allowedTimesBase = useMemo(() => (startDate ? allowedTimeListForDate(startDate) : []), [startDate]);
+  const allowedTimes = useMemo(
+    () => filterByServiceWindow(allowedTimesBase, serviceType),
+    [allowedTimesBase, serviceType]
+  );
+
+  // block booking if slot already booked
+  function slotIsBooked(dateStr: string, timeStr: string) {
+    if (!dateStr || !timeStr) return false;
+    return bookings.some(b => {
+      if (!b.start?.startsWith(dateStr)) return false;
+      return hhmm(new Date(b.start)) === timeStr;
+    });
+  }
+
+  const timeMin = allowedTimes[0];
+  const timeMax = allowedTimes[allowedTimes.length - 1];
+
   function combineDateTime(date: string, time: string) {
     if (!date || !time) return null;
     const iso = new Date(`${date}T${time}`);
@@ -151,6 +223,21 @@ export default function BookingForm() {
     e.preventDefault();
     setMessage(null);
 
+    if (!startDate || !startTime) {
+      setMessage('Please choose a date and time.');
+      return;
+    }
+
+    // Validate against weekly + service window (client side)
+    if (!allowedTimes.includes(startTime)) {
+      setMessage('Selected time is not available for this service.');
+      return;
+    }
+    if (slotIsBooked(startDate, startTime)) {
+      setMessage('That slot has just been booked. Please pick another time.');
+      return;
+    }
+
     const startISO = combineDateTime(startDate, startTime);
     if (!startISO) {
       setMessage('Please choose a valid date and time.');
@@ -159,7 +246,6 @@ export default function BookingForm() {
 
     const form = e.currentTarget as HTMLFormElement;
     const fd = new FormData(form);
-
     const baseNotes = String(fd.get('notes') || '').trim();
     const petsLine = `Pets: ${petCount}${selectedService ? ` (${selectedService.name})` : ''}. Estimated total: ${totalDisplay}.`;
     const notes = baseNotes ? `${baseNotes}\n${petsLine}` : petsLine;
@@ -183,14 +269,13 @@ export default function BookingForm() {
         body: JSON.stringify(payload),
       });
 
-      try {
-        await res.json();
-      } catch {}
+      let body: any = {};
+      try { body = await res.json(); } catch {}
 
       if (res.ok) {
         router.push('/book/thank-you');
       } else {
-        setMessage('Something went wrong. Please try again.');
+        setMessage(body?.error || 'Something went wrong. Please try another time.');
       }
     } catch {
       setMessage('Network error. Please try again.');
@@ -216,7 +301,16 @@ export default function BookingForm() {
           required
           className="input min-h-12"
           value={serviceId ?? undefined}
-          onChange={(e) => setServiceId(Number(e.target.value))}
+          onChange={(e) => {
+            setServiceId(Number(e.target.value));
+            // if current time now invalid for new service type, clear it
+            if (startTime && !filterByServiceWindow(allowedTimesBase, classifyService(
+              services.find(s => s.id === Number(e.target.value)) || null
+            )).includes(startTime)) {
+              setStartTime('');
+            }
+            setMessage(null);
+          }}
         >
           {services.map((s) => (
             <option key={s.id} value={s.id}>
@@ -229,7 +323,7 @@ export default function BookingForm() {
         )}
       </div>
 
-      {/* Pets (Walks & Overnight only) */}
+      {/* Pets */}
       {showPetSelector && (
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
@@ -240,19 +334,15 @@ export default function BookingForm() {
               value={petCount}
               onChange={(e) => setPetCount(Number(e.target.value))}
             >
-              {Array.from({ length: maxPets }, (_, i) => i + 1).map((n) => (
+              {Array.from({ length: maxPets }, (_, i) => i + 1).map(n => (
                 <option key={n} value={n}>{n}</option>
               ))}
             </select>
-            {isWalk(selectedService) && (
-              <p className="mt-1 text-xs text-gray-600">
-                Walks support up to 2 dogs with special 2-dog pricing.
-              </p>
+            {selectedService?.name.startsWith('Dog Walk') && (
+              <p className="mt-1 text-xs text-gray-600">Walks support up to 2 dogs with special 2-dog pricing.</p>
             )}
-            {isOvernightBoarding(selectedService) && (
-              <p className="mt-1 text-xs text-gray-600">
-                Up to 3 additional dogs. Pets must be picked up by 11:59pm.
-              </p>
+            {selectedService?.name.startsWith('Boarding') && (
+              <p className="mt-1 text-xs text-gray-600">Up to 3 additional dogs. Pets must be picked up by 11:59pm.</p>
             )}
           </div>
         </div>
@@ -280,11 +370,37 @@ export default function BookingForm() {
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="label" htmlFor="startDate">Date</label>
-            <input id="startDate" name="startDate" type="date" required className="input min-h-12" value={startDate} onChange={(e) => setStartDate(e.target.value)} onFocus={scrollIntoViewCentered} />
+            <input
+              id="startDate"
+              name="startDate"
+              type="date"
+              required
+              className="input min-h-12"
+              value={startDate}
+              onChange={(e) => { setStartDate(e.target.value); setMessage(null); }}
+              onFocus={scrollIntoViewCentered}
+            />
           </div>
           <div>
             <label className="label" htmlFor="startTime">Time</label>
-            <input id="startTime" name="startTime" type="time" required className="input min-h-12" value={startTime} onChange={(e) => setStartTime(e.target.value)} onFocus={scrollIntoViewCentered} />
+            <input
+              id="startTime"
+              name="startTime"
+              type="time"
+              required
+              className="input min-h-12"
+              value={startTime}
+              min={timeMin}
+              max={timeMax}
+              step={60 * 30}
+              onChange={(e) => { setStartTime(e.target.value); setMessage(null); }}
+              onFocus={scrollIntoViewCentered}
+            />
+            {startDate && (
+              <p className="mt-1 text-xs text-gray-600">
+                Allowed times for this service: {allowedTimes.length ? `${allowedTimes[0]} — ${allowedTimes[allowedTimes.length - 1]} (30m steps)` : '—'}
+              </p>
+            )}
           </div>
         </div>
       </div>

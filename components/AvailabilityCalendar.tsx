@@ -3,58 +3,56 @@
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import {
-  addMonths, subMonths, startOfMonth, endOfMonth, startOfWeek, endOfWeek,
-  isSameMonth, isSameDay, format, addDays, getDay
+  addDays,
+  addMonths,
+  endOfMonth,
+  endOfWeek,
+  format,
+  getDay,
+  isSameDay,
+  isSameMonth,
+  startOfMonth,
+  startOfWeek,
+  subMonths,
 } from 'date-fns';
 
 type TimeRange = { start: string; end: string };
 type WeeklySchedule = Record<number, TimeRange[]>;
-type Mode = 'walks' | 'overnight';
 
-// Walks & Drop-ins: Tue–Fri after 6pm; Sat/Sun/Mon all day (9–19 for nice slots)
-const walks: WeeklySchedule = {
-  0: [{ start: '06:30', end: '21:00' }], // Sun
-  1: [{ start: '06:30', end: '21:00' }], // Mon
-  2: [{ start: '18:00', end: '21:00' }], // Tue
-  3: [{ start: '18:00', end: '21:00' }], // Wed
-  4: [{ start: '18:00', end: '21:00' }], // Thu
-  5: [{ start: '18:00', end: '21:00' }], // Fri
-  6: [{ start: '06:30', end: '21:00' }], // Sat
+// Single schedule:
+// - Sat/Sun/Mon = 06:00–20:30
+// - Tue–Fri = 18:00–20:30
+const schedule: WeeklySchedule = {
+  0: [{ start: '06:30', end: '20:30' }], // Sun
+  1: [{ start: '06:30', end: '20:30' }], // Mon
+  2: [{ start: '18:00', end: '20:30' }], // Tue
+  3: [{ start: '18:00', end: '20:30' }], // Wed
+  4: [{ start: '18:00', end: '20:30' }], // Thu
+  5: [{ start: '18:00', end: '20:30' }], // Fri
+  6: [{ start: '06:30', end: '20:30' }], // Sat
 };
 
-// Overnight (Sitting/Boarding): Fri after 6pm; Sat/Sun/Mon all day.
-// Note: pets must be picked up by 11:59pm (shown as a note).
-const overnight: WeeklySchedule = {
-  0: [{ start: '09:00', end: '23:59' }], // Sun
-  1: [{ start: '09:00', end: '23:59' }], // Mon
-  2: [],                                  // Tue
-  3: [],                                  // Wed
-  4: [],                                  // Thu
-  5: [{ start: '19:00', end: '23:59' }], // Fri
-  6: [{ start: '09:00', end: '23:59' }], // Sat
-};
-
-function rangesToSlots(ranges: TimeRange[], isOvernight: boolean) {
+// Generate HH:mm slots every 30 minutes, inclusive of the end time.
+function rangesToSlots(ranges: TimeRange[], stepMin = 30): string[] {
   const out: string[] = [];
   for (const r of ranges) {
-    const stepMin = isOvernight ? 240 : 60; // fewer options for overnight
     const start = new Date(2000, 0, 1, +r.start.slice(0, 2), +r.start.slice(3, 5));
-    const end   = new Date(2000, 0, 1, +r.end.slice(0, 2),   +r.end.slice(3, 5));
-    for (let t = new Date(start); t < end; t.setMinutes(t.getMinutes() + stepMin)) {
+    const end = new Date(2000, 0, 1, +r.end.slice(0, 2), +r.end.slice(3, 5));
+    // include end time as a valid start
+    for (let t = new Date(start); t <= end; t.setMinutes(t.getMinutes() + stepMin)) {
       const hh = String(t.getHours()).padStart(2, '0');
       const mm = String(t.getMinutes()).padStart(2, '0');
       out.push(`${hh}:${mm}`);
     }
   }
-  return out;
+  return Array.from(new Set(out));
 }
 
 export default function AvailabilityCalendar() {
   const today = new Date();
-  const [mode, setMode] = useState<Mode>('walks');
   const [currentMonth, setCurrentMonth] = useState(startOfMonth(today));
   const [selectedDate, setSelectedDate] = useState<Date | null>(today);
-  const [bookings, setBookings] = useState<{id:number;start:string}[]>([]);
+  const [bookings, setBookings] = useState<{ id: number; start: string }[]>([]);
 
   useEffect(() => {
     (async () => {
@@ -70,8 +68,7 @@ export default function AvailabilityCalendar() {
     })();
   }, []);
 
-  const schedule = mode === 'overnight' ? overnight : walks;
-
+  // Build the visible matrix of days (6 rows x 7 columns)
   const monthMatrix = useMemo(() => {
     const start = startOfWeek(startOfMonth(currentMonth));
     const end = endOfWeek(endOfMonth(currentMonth));
@@ -83,7 +80,8 @@ export default function AvailabilityCalendar() {
   }, [currentMonth]);
 
   function daySlots(date: Date) {
-    return rangesToSlots(schedule[getDay(date)] || [], mode === 'overnight');
+    const ranges = schedule[getDay(date)] || [];
+    return rangesToSlots(ranges, 30);
   }
 
   function availableSlots(date: Date) {
@@ -93,7 +91,8 @@ export default function AvailabilityCalendar() {
     const booked = bookings
       .filter((b) => b.start?.startsWith(dateStr))
       .map((b) => format(new Date(b.start), 'HH:mm'));
-    return slots.filter((s) => !booked.includes(s));
+    const bookedSet = new Set(booked);
+    return slots.filter((s) => !bookedSet.has(s));
   }
 
   function fullyBooked(date: Date) {
@@ -105,34 +104,29 @@ export default function AvailabilityCalendar() {
 
   return (
     <div className="space-y-6">
-      {/* mode toggle */}
-      <div className="inline-flex rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden">
-        <button
-          className={`px-4 py-2 text-sm ${mode === 'walks' ? 'bg-brand text-white' : 'hover:bg-gray-50'}`}
-          onClick={() => setMode('walks')}
-        >
-          Walks & Drop-ins
-        </button>
-        <button
-          className={`px-4 py-2 text-sm border-l border-gray-200 ${mode === 'overnight' ? 'bg-brand text-white' : 'hover:bg-gray-50'}`}
-          onClick={() => setMode('overnight')}
-        >
-          Overnight (Sitting/Boarding)
-        </button>
+      {/* Header */}
+      <div className="space-y-1">
+        <h2 className="text-xl sm:text-2xl font-extrabold">Availability</h2>
+        <p className="text-gray-700 text-sm sm:text-base">
+          Sat–Mon: 6:00am–8:30pm • Tue–Fri: 6:00pm–8:30pm. Pick a date to see open times.
+        </p>
       </div>
 
-      {/* month controls */}
+      {/* Month controls */}
       <div className="flex items-center justify-between">
         <button className="btn-ghost" onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}>←</button>
-        <h2 className="text-xl sm:text-2xl font-extrabold">{format(currentMonth, 'MMMM yyyy')}</h2>
+        <h3 className="text-lg sm:text-xl font-bold">{format(currentMonth, 'MMMM yyyy')}</h3>
         <button className="btn-ghost" onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}>→</button>
       </div>
 
-      {/* calendar */}
+      {/* Calendar grid */}
       <div className="card">
         <div className="grid grid-cols-7 gap-2 text-xs sm:text-sm font-semibold text-gray-600 mb-2">
-          {['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map((d) => (<div key={d} className="text-center">{d}</div>))}
+          {['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map((d) => (
+            <div key={d} className="text-center">{d}</div>
+          ))}
         </div>
+
         <div className="grid grid-cols-7 gap-2">
           {monthMatrix.map((week, i) => (
             <div key={i} className="contents">
@@ -166,17 +160,12 @@ export default function AvailabilityCalendar() {
         </div>
       </div>
 
-      {/* slots for selected day */}
+      {/* Slots for selected day */}
       {selectedDate && (
         <div className="card space-y-3">
-          <div className="flex items-center justify-between flex-wrap gap-2">
-            <h3 className="text-lg sm:text-xl font-bold">{format(selectedDate, 'EEEE, MMM d')}</h3>
-            {mode === 'overnight' && (
-              <p className="text-xs sm:text-sm text-gray-600">
-                Pets must be picked up by 11:59pm.
-              </p>
-            )}
-          </div>
+          <h4 className="text-lg sm:text-xl font-bold">
+            {format(selectedDate, 'EEEE, MMM d')}
+          </h4>
 
           {selectedSlots.length ? (
             <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
