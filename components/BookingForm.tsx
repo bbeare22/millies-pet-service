@@ -102,7 +102,11 @@ export default function BookingForm() {
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
-  // Prefill
+  // NEW: vaccine confirmation + optional upload
+  const [confirmVaccinated, setConfirmVaccinated] = useState(false);
+  const [vaccineFileName, setVaccineFileName] = useState<string>('');
+
+  // Prefill from /availability -> /book
   const prefillServiceId = params.get('serviceId');
   const prefillDogs = params.get('dogs');
   const prefillDate = params.get('date');
@@ -168,7 +172,7 @@ export default function BookingForm() {
   useEffect(() => {
     if (petCount > maxPets) setPetCount(maxPets);
     if (petCount < 1) setPetCount(1);
-  }, [maxPets]);
+  }, [maxPets, petCount]);
 
   // price calc (same rules you had)
   function computeTotalCents(s: Service | null, pets: number): number {
@@ -228,6 +232,11 @@ export default function BookingForm() {
       return;
     }
 
+    if (!confirmVaccinated) {
+      setMessage('Please confirm your dog(s) are vaccinated before booking.');
+      return;
+    }
+
     // Validate against weekly + service window (client side)
     if (!allowedTimes.includes(startTime)) {
       setMessage('Selected time is not available for this service.');
@@ -248,7 +257,8 @@ export default function BookingForm() {
     const fd = new FormData(form);
     const baseNotes = String(fd.get('notes') || '').trim();
     const petsLine = `Pets: ${petCount}${selectedService ? ` (${selectedService.name})` : ''}. Estimated total: ${totalDisplay}.`;
-    const notes = baseNotes ? `${baseNotes}\n${petsLine}` : petsLine;
+    const vaccineLine = `Vaccinations confirmed. ${vaccineFileName ? `Proof file: ${vaccineFileName}.` : 'No proof file uploaded.'}`;
+    const notes = [baseNotes, petsLine, vaccineLine].filter(Boolean).join('\n');
 
     const payload = {
       serviceId,
@@ -259,6 +269,8 @@ export default function BookingForm() {
       notes,
       petCount,
       estimatedTotalCents: totalCents,
+      confirmVaccinated: true,
+      vaccineProofName: vaccineFileName || null,
     };
 
     try {
@@ -304,9 +316,10 @@ export default function BookingForm() {
           onChange={(e) => {
             setServiceId(Number(e.target.value));
             // if current time now invalid for new service type, clear it
-            if (startTime && !filterByServiceWindow(allowedTimesBase, classifyService(
-              services.find(s => s.id === Number(e.target.value)) || null
-            )).includes(startTime)) {
+            if (startTime && !filterByServiceWindow(
+                allowedTimesBase,
+                classifyService(services.find(s => s.id === Number(e.target.value)) || null
+              )).includes(startTime)) {
               setStartTime('');
             }
             setMessage(null);
@@ -409,6 +422,40 @@ export default function BookingForm() {
       <div>
         <label className="label" htmlFor="notes">Notes (optional)</label>
         <textarea id="notes" name="notes" className="input" rows={4} placeholder="Gate code, pup preferences, etc." />
+      </div>
+
+      {/* Vaccine Requirement + Upload */}
+      <div className="rounded-xl border border-yellow-200 bg-yellow-50 p-4 text-sm text-yellow-800">
+        <p className="font-semibold mb-1">🐾 Vaccine Requirement</p>
+        <p className="mb-3">
+          Dogs must be vaccinated for <strong>Rabies</strong>, <strong>Distemper</strong>, and <strong>Bordetella</strong>.
+        </p>
+
+        <label className="inline-flex items-center gap-2 mb-3">
+          <input
+            type="checkbox"
+            className="h-4 w-4 accent-amber-600"
+            checked={confirmVaccinated}
+            onChange={(e) => setConfirmVaccinated(e.target.checked)}
+            aria-required="true"
+          />
+          <span>I confirm my dog(s) are vaccinated.</span>
+        </label>
+
+        <div className="mt-2">
+          <label className="label" htmlFor="vaccineProof">Upload proof (optional)</label>
+          <input
+            id="vaccineProof"
+            name="vaccineProof"
+            type="file"
+            accept=".jpg,.jpeg,.png,.pdf"
+            className="input min-h-12"
+            onChange={(e) => setVaccineFileName(e.currentTarget.files?.[0]?.name || '')}
+          />
+          {vaccineFileName && (
+            <p className="text-xs text-gray-600 mt-1">Selected: {vaccineFileName}</p>
+          )}
+        </div>
       </div>
 
       {/* Price summary */}

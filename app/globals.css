@@ -63,9 +63,9 @@ body {
 }
 
 /* Hero watermark: subtle paw pattern */
-.hero-watermark {
+/*.hero-watermark {
   /* light gradient + paw-print pattern using a tiny inline SVG */
-  background: radial-gradient(
+/* background: radial-gradient(
       1200px 400px at 40% 0%,
       rgba(148, 181, 180, 0.1),
       rgba(148, 181, 180, 0) 50%
