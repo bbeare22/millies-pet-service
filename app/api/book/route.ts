@@ -84,7 +84,16 @@ function classifyServiceName(name: string): SType {
   if (n.startsWith('potty break')) return 'dropin';
   if (n.startsWith('boarding')) return 'overnightBoarding';
   if (n.startsWith('sitting')) return 'overnightSitting';
-  if (n.startsWith('add-on') || n.startsWith('addon') || n.includes('add-on')) return 'addon';
+
+  // Robust add-on detection (Administration of Meds, Vet Appointment, Pick up/Drop-off)
+  if (
+    /administration of meds/i.test(name) ||
+    /vet/i.test(name) ||
+    /(pick ?up|drop[- ]?off)/i.test(name) ||
+    /add[- ]?on/i.test(name)
+  ) {
+    return 'addon';
+  }
   return 'other';
 }
 
@@ -99,7 +108,7 @@ function windowsForServiceAndDay(sType: SType, wd: number): TimeRange[] {
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { serviceId, customerName, email, phone, start, notes, petCount } = body || {};
+    const { serviceId, customerName, email, phone, start, notes } = body || {};
 
     if (!serviceId || !customerName || !email || !phone || !start) {
       return NextResponse.json({ error: 'Missing fields.' }, { status: 400 });
@@ -124,8 +133,6 @@ export async function POST(req: Request) {
     const wd = startDate.getDay();
     const allowedTimes = rangesToSlots(windowsForServiceAndDay(sType, wd), 30);
     const timeStr = hhmm(startDate);
-
-    // Sitting Tue–Fri requires pet door (client sends petCount & notes; we only verify time here).
 
     // 1) Must be within per-service availability window
     if (!allowedTimes.includes(timeStr)) {
@@ -157,8 +164,6 @@ export async function POST(req: Request) {
         notes: notes ? String(notes) : '',
       },
     });
-
-    // (Optional) send notifications if SMTP/Twilio are configured
 
     return NextResponse.json({ ok: true, bookingId: booking.id });
   } catch (e) {
