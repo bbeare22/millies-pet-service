@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useTransition } from 'react';
+import { useEffect, useMemo, useState, useTransition } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 type Booking = {
@@ -8,11 +8,11 @@ type Booking = {
   customerName: string;
   email: string;
   phone: string;
-  start: string;
+  start: string; // ISO (service date/time)
   status: 'PENDING' | 'CONFIRMED' | 'CANCELLED';
   notes: string | null;
   service: { name: string };
-  createdAt: string;
+  createdAt: string; // ISO (when booking was created)
 };
 
 export default function AdminBookingsClient() {
@@ -46,6 +46,18 @@ export default function AdminBookingsClient() {
     };
   }, []);
 
+  // 🔽 NEW: always show soonest service first (then by createdAt)
+  const sortedBookings = useMemo(() => {
+    return [...bookings].sort((a, b) => {
+      const ta = new Date(a.start).getTime();
+      const tb = new Date(b.start).getTime();
+      if (ta !== tb) return ta - tb;
+      const ca = new Date(a.createdAt).getTime();
+      const cb = new Date(b.createdAt).getTime();
+      return ca - cb;
+    });
+  }, [bookings]);
+
   async function doAction(id: number, action: 'confirm' | 'cancel' | 'delete') {
     setError(null);
     try {
@@ -66,7 +78,7 @@ export default function AdminBookingsClient() {
       }
 
       startTransition(() => router.refresh());
-      // Optimistic update
+      // Optimistic update (will keep sort via useMemo)
       setBookings(prev =>
         action === 'delete'
           ? prev.filter(b => b.id !== id)
@@ -116,11 +128,10 @@ export default function AdminBookingsClient() {
 
   if (loading) return <p>Loading…</p>;
   if (error) return <p className="text-red-600">Error: {error}</p>;
-  if (!bookings.length) return <p>No bookings yet.</p>;
+  if (!sortedBookings.length) return <p>No bookings yet.</p>;
 
   const statusBadge = (s: Booking['status']) => {
-    const base =
-      'inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold';
+    const base = 'inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold';
     if (s === 'CONFIRMED') return `${base} bg-green-100 text-green-800`;
     if (s === 'CANCELLED') return `${base} bg-red-100 text-red-800`;
     return `${base} bg-yellow-100 text-yellow-800`;
@@ -153,11 +164,10 @@ export default function AdminBookingsClient() {
     </div>
   );
 
-  // --------- MOBILE (cards) ----------
-  // Hidden on md+, visible under md
+  // Mobile cards (smaller screens)
   const MobileList = () => (
     <div className="md:hidden space-y-3">
-      {bookings.map(b => {
+      {sortedBookings.map(b => {
         const dt = new Date(b.start);
         const when = dt.toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' });
         return (
@@ -197,8 +207,7 @@ export default function AdminBookingsClient() {
     </div>
   );
 
-  // --------- DESKTOP/TABLET (table) ----------
-  // Visible on md+, hidden under md
+  // Desktop/tablet table (md+)
   const DesktopTable = () => (
     <div className="hidden md:block overflow-x-auto">
       <table className="w-full text-sm border-separate border-spacing-y-2">
@@ -214,7 +223,7 @@ export default function AdminBookingsClient() {
           </tr>
         </thead>
         <tbody>
-          {bookings.map(b => {
+          {sortedBookings.map(b => {
             const dt = new Date(b.start);
             const when = dt.toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' });
             return (
@@ -251,12 +260,9 @@ export default function AdminBookingsClient() {
 
   return (
     <div className="space-y-4">
-      {/* tiny header helper for context */}
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold">Bookings</h2>
-        <div className="text-xs text-gray-500">
-          {bookings.length} total
-        </div>
+        <div className="text-xs text-gray-500">{sortedBookings.length} total</div>
       </div>
 
       <MobileList />
