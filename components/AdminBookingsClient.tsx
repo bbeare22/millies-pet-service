@@ -41,7 +41,9 @@ export default function AdminBookingsClient() {
         if (active) setLoading(false);
       }
     })();
-    return () => { active = false; };
+    return () => {
+      active = false;
+    };
   }, []);
 
   async function doAction(id: number, action: 'confirm' | 'cancel' | 'delete') {
@@ -62,13 +64,16 @@ export default function AdminBookingsClient() {
         });
         if (!res.ok) throw new Error('Update failed');
       }
+
       startTransition(() => router.refresh());
-      // Optimistic update:
-      setBookings((prev) =>
+      // Optimistic update
+      setBookings(prev =>
         action === 'delete'
-          ? prev.filter((b) => b.id !== id)
-          : prev.map((b) =>
-              b.id === id ? { ...b, status: action === 'confirm' ? 'CONFIRMED' : 'CANCELLED' } : b
+          ? prev.filter(b => b.id !== id)
+          : prev.map(b =>
+              b.id === id
+                ? { ...b, status: action === 'confirm' ? 'CONFIRMED' : 'CANCELLED' }
+                : b
             )
       );
     } catch (e: any) {
@@ -113,8 +118,89 @@ export default function AdminBookingsClient() {
   if (error) return <p className="text-red-600">Error: {error}</p>;
   if (!bookings.length) return <p>No bookings yet.</p>;
 
-  return (
-    <div className="overflow-x-auto">
+  const statusBadge = (s: Booking['status']) => {
+    const base =
+      'inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold';
+    if (s === 'CONFIRMED') return `${base} bg-green-100 text-green-800`;
+    if (s === 'CANCELLED') return `${base} bg-red-100 text-red-800`;
+    return `${base} bg-yellow-100 text-yellow-800`;
+  };
+
+  const ActionButtons = ({ b }: { b: Booking }) => (
+    <div className="flex flex-wrap gap-2">
+      <button
+        onClick={() => doAction(b.id, 'confirm')}
+        className="btn text-xs px-3 py-1"
+        disabled={isPending || b.status === 'CONFIRMED'}
+      >
+        Confirm
+      </button>
+      <button
+        onClick={() => doAction(b.id, 'cancel')}
+        className="btn-ghost text-xs px-3 py-1"
+        disabled={isPending || b.status === 'CANCELLED'}
+      >
+        Cancel
+      </button>
+      <button
+        onClick={() => doAction(b.id, 'delete')}
+        className="text-xs px-3 py-1 rounded-2xl border border-gray-300 hover:bg-gray-50"
+        disabled={isPending}
+        title="Delete booking"
+      >
+        Delete
+      </button>
+    </div>
+  );
+
+  // --------- MOBILE (cards) ----------
+  // Hidden on md+, visible under md
+  const MobileList = () => (
+    <div className="md:hidden space-y-3">
+      {bookings.map(b => {
+        const dt = new Date(b.start);
+        const when = dt.toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' });
+        return (
+          <div key={b.id} className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <div className="text-sm text-gray-500">{when}</div>
+                <div className="text-base font-semibold mt-0.5">{b.customerName}</div>
+                <div className="text-sm text-gray-700">{b.service?.name}</div>
+              </div>
+              <span className={statusBadge(b.status)}>{b.status}</span>
+            </div>
+
+            <div className="mt-3 grid grid-cols-1 gap-2">
+              <div className="text-sm">
+                <div className="text-gray-500">Email</div>
+                <a className="underline break-words" href={`mailto:${b.email}`}>{b.email}</a>
+              </div>
+              <div className="text-sm">
+                <div className="text-gray-500">Phone</div>
+                <a className="underline" href={`tel:${b.phone}`}>{b.phone}</a>
+              </div>
+              {b.notes ? (
+                <div className="text-sm">
+                  <div className="text-gray-500">Notes</div>
+                  <div className="whitespace-pre-wrap break-words">{b.notes}</div>
+                </div>
+              ) : null}
+            </div>
+
+            <div className="mt-3">
+              <ActionButtons b={b} />
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+
+  // --------- DESKTOP/TABLET (table) ----------
+  // Visible on md+, hidden under md
+  const DesktopTable = () => (
+    <div className="hidden md:block overflow-x-auto">
       <table className="w-full text-sm border-separate border-spacing-y-2">
         <thead>
           <tr className="text-left text-gray-600">
@@ -128,68 +214,53 @@ export default function AdminBookingsClient() {
           </tr>
         </thead>
         <tbody>
-          {bookings.map((b) => {
+          {bookings.map(b => {
             const dt = new Date(b.start);
             const when = dt.toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' });
             return (
-              <tr key={b.id} className="bg-white shadow-sm rounded-xl">
-                <td className="px-3 py-2 align-top whitespace-nowrap">{when}</td>
-                <td className="px-3 py-2 align-top">
+              <tr key={b.id} className="bg-white shadow-sm rounded-xl align-top">
+                <td className="px-3 py-2 whitespace-nowrap">{when}</td>
+                <td className="px-3 py-2">
                   <div className="font-medium">{b.customerName}</div>
                 </td>
-                <td className="px-3 py-2 align-top">{b.service?.name}</td>
-                <td className="px-3 py-2 align-top">
-                  <div><a className="underline" href={`mailto:${b.email}`}>{b.email}</a></div>
-                  <div className="text-gray-600">{b.phone}</div>
-                </td>
-                <td className="px-3 py-2 align-top max-w-[20ch] truncate" title={b.notes || ''}>
-                  {b.notes || '—'}
-                </td>
-                <td className="px-3 py-2 align-top">
-                  <span
-                    className={
-                      'inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold ' +
-                      (b.status === 'CONFIRMED'
-                        ? 'bg-green-100 text-green-800'
-                        : b.status === 'CANCELLED'
-                        ? 'bg-red-100 text-red-800'
-                        : 'bg-yellow-100 text-yellow-800')
-                    }
-                  >
-                    {b.status}
-                  </span>
-                </td>
-                <td className="px-3 py-2 align-top">
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => doAction(b.id, 'confirm')}
-                      className="btn text-xs px-3 py-1"
-                      disabled={isPending || b.status === 'CONFIRMED'}
-                    >
-                      Confirm
-                    </button>
-                    <button
-                      onClick={() => doAction(b.id, 'cancel')}
-                      className="btn-ghost text-xs px-3 py-1"
-                      disabled={isPending || b.status === 'CANCELLED'}
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      onClick={() => doAction(b.id, 'delete')}
-                      className="text-xs px-3 py-1 rounded-2xl border border-gray-300 hover:bg-gray-50"
-                      disabled={isPending}
-                      title="Delete booking"
-                    >
-                      Delete
-                    </button>
+                <td className="px-3 py-2">{b.service?.name}</td>
+                <td className="px-3 py-2">
+                  <div className="break-words max-w-[28ch]">
+                    <a className="underline" href={`mailto:${b.email}`}>{b.email}</a>
                   </div>
+                  <div className="text-gray-600">
+                    <a className="underline" href={`tel:${b.phone}`}>{b.phone}</a>
+                  </div>
+                </td>
+                <td className="px-3 py-2 max-w-[32ch]">
+                  <div className="truncate" title={b.notes || ''}>{b.notes || '—'}</div>
+                </td>
+                <td className="px-3 py-2">
+                  <span className={statusBadge(b.status)}>{b.status}</span>
+                </td>
+                <td className="px-3 py-2">
+                  <ActionButtons b={b} />
                 </td>
               </tr>
             );
           })}
         </tbody>
       </table>
+    </div>
+  );
+
+  return (
+    <div className="space-y-4">
+      {/* tiny header helper for context */}
+      <div className="flex items-center justify-between">
+        <h2 className="text-lg font-semibold">Bookings</h2>
+        <div className="text-xs text-gray-500">
+          {bookings.length} total
+        </div>
+      </div>
+
+      <MobileList />
+      <DesktopTable />
     </div>
   );
 }

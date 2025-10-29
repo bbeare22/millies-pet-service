@@ -152,15 +152,39 @@ export default function AvailabilityCalendar() {
 
   return (
     <section className="py-6 space-y-4">
-      <div className="flex items-baseline justify-between">
+      {/* Header + styled availability banner */}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <h1 className="text-xl font-semibold">Availability</h1>
-          <p className="text-xs text-gray-600">
-            Sat–Mon: 6:30am–8:30pm • Tue–Fri: 6:00pm–8:30pm. Pick a date to see open times.
-          </p>
+
+          {/* PROMINENT BANNER */}
+          <div className="mt-2 rounded-2xl border border-amber-200 bg-amber-50 text-amber-900 p-3 shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
+            <div className="flex items-start gap-2">
+              <div className="text-lg mt-0.5">🕒</div>
+              <div className="flex-1">
+                <div className="text-sm font-semibold tracking-wide">
+                  Millie’s Hours
+                </div>
+                <div className="mt-1 flex flex-wrap items-center gap-2">
+                  <span className="inline-flex items-center gap-1 rounded-full border border-amber-200 bg-white px-3 py-1 text-xs font-semibold text-amber-900">
+                    <span className="h-2 w-2 rounded-full bg-emerald-500" aria-hidden />
+                    Sat–Mon: <span className="font-bold">6:30am–8:30pm</span>
+                  </span>
+                  <span className="inline-flex items-center gap-1 rounded-full border border-amber-200 bg-white px-3 py-1 text-xs font-semibold text-amber-900">
+                    <span className="h-2 w-2 rounded-full bg-blue-500" aria-hidden />
+                    Tue–Fri: <span className="font-bold">6:00pm–8:30pm</span>
+                  </span>
+                </div>
+                <p className="mt-1.5 text-xs text-amber-800/90">
+                  Pick a date to see the exact open times. Fully booked days are greyed out. Times may very depending on service.
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        {/* Month pager */}
+        <div className="flex items-center gap-2 self-end sm:self-auto">
           <button
             className="btn-ghost text-sm px-3 py-1.5"
             onClick={() => setCursor((d) => addMonths(d, -1))}

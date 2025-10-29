@@ -32,6 +32,8 @@ model Booking {
   status       String   @default("PENDING") // "PENDING" | "CONFIRMED" | "CANCELLED"
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+  vaccinated          Boolean?  @default(false)
+  vaccineProofUrl     String?
 
   @@index([start])
 }
