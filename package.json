@@ -9,8 +9,8 @@
     "start": "next start",
     "prisma:generate": "prisma generate",
     "prisma:push": "prisma db push",
-    "seed": "node prisma/seed.js",
-    "reset:bookings": "node prisma/resetBookings.js"
+    "seed": "node prisma/seed.cjs",
+    "reset:bookings": "node prisma/resetBookings.cjs"
   },
   "dependencies": {
     "@prisma/client": "^5.19.1",

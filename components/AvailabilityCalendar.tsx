@@ -13,8 +13,8 @@ const DAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
 /** Allowed windows (24h) */
 const WINDOW = {
-  weekendAllDay: { start: { h: 6, m: 30 }, end: { h: 20, m: 30 } }, // Sat–Mon
-  weekdayEvening: { start: { h: 18, m: 0 }, end: { h: 20, m: 30 } }, // Tue–Fri
+  weekendAllDay: { start: { h: 8, m: 0 }, end: { h: 20, m: 30 } },   // Sat–Mon 8:00–20:30
+  weekdayEvening: { start: { h: 18, m: 30 }, end: { h: 20, m: 30 } } // Tue–Fri 18:30–20:30
 };
 
 function toHM(date: Date) {
@@ -96,7 +96,7 @@ export default function AvailabilityCalendar() {
     };
   }, []);
 
-  // Build a Set of booked minute-ISO strings for quick lookups
+  // Booked set for O(1) checks
   const bookedSet = useMemo(() => {
     const s = new Set<string>();
     for (const b of bookings) s.add(minuteISO(b.start));
@@ -108,7 +108,6 @@ export default function AvailabilityCalendar() {
   const monthEnd = new Date(cursor.getFullYear(), cursor.getMonth() + 1, 0);
   const weeks: Date[][] = [];
   {
-    // fill calendar matrix (sun..sat rows)
     let d = new Date(monthStart);
     d.setDate(d.getDate() - d.getDay());
     while (d <= monthEnd || d.getDay() !== 0) {
@@ -121,7 +120,7 @@ export default function AvailabilityCalendar() {
     }
   }
 
-  // All slots for selected day and whether each is booked
+  // Slots for the selected day
   const daySlots = useMemo(() => {
     if (!selected) return [];
     const slots = buildSlotsFor(selected);
@@ -137,7 +136,6 @@ export default function AvailabilityCalendar() {
 
   function selectDay(d: Date) {
     setSelected(d);
-    // Scroll to the slots list for convenience
     const el = document.getElementById('slots');
     if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
@@ -151,59 +149,49 @@ export default function AvailabilityCalendar() {
   }
 
   return (
-    <section className="py-6 space-y-4">
-      {/* Header + styled availability banner */}
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-          <h1 className="text-xl font-semibold">Availability</h1>
-
-          {/* PROMINENT BANNER */}
-          <div className="mt-2 rounded-2xl border border-amber-200 bg-amber-50 text-amber-900 p-3 shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
-            <div className="flex items-start gap-2">
-              <div className="text-lg mt-0.5">🕒</div>
-              <div className="flex-1">
-                <div className="text-sm font-semibold tracking-wide">
-                  Millie’s Hours
-                </div>
-                <div className="mt-1 flex flex-wrap items-center gap-2">
-                  <span className="inline-flex items-center gap-1 rounded-full border border-amber-200 bg-white px-3 py-1 text-xs font-semibold text-amber-900">
-                    <span className="h-2 w-2 rounded-full bg-emerald-500" aria-hidden />
-                    Sat–Mon: <span className="font-bold">6:30am–8:30pm</span>
-                  </span>
-                  <span className="inline-flex items-center gap-1 rounded-full border border-amber-200 bg-white px-3 py-1 text-xs font-semibold text-amber-900">
-                    <span className="h-2 w-2 rounded-full bg-blue-500" aria-hidden />
-                    Tue–Fri: <span className="font-bold">6:00pm–8:30pm</span>
-                  </span>
-                </div>
-                <p className="mt-1.5 text-xs text-amber-800/90">
-                  Pick a date to see the exact open times. Fully booked days are greyed out. Times may very depending on service.
-                </p>
-              </div>
-            </div>
-          </div>
+    <section className="space-y-8">
+      <div className="rounded-xl border border-gray-200 bg-white p-3 shadow-sm">
+        <div className="flex flex-wrap gap-2 items-center">
+          <span className="px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 text-xs font-semibold">
+            Walks: Sat–Mon 8:00am–7:30pm • Tue–Fri 6:30pm–7:30pm
+          </span>
         </div>
-
-        {/* Month pager */}
-        <div className="flex items-center gap-2 self-end sm:self-auto">
-          <button
-            className="btn-ghost text-sm px-3 py-1.5"
-            onClick={() => setCursor((d) => addMonths(d, -1))}
-            aria-label="Previous month"
-          >
-            ←
-          </button>
-          <div className="text-sm font-medium">
-            {format(cursor, 'MMMM yyyy')}
-          </div>
-          <button
-            className="btn-ghost text-sm px-3 py-1.5"
-            onClick={() => setCursor((d) => addMonths(d, 1))}
-            aria-label="Next month"
-          >
-            →
-          </button>
+        <div className="mt-2 flex flex-wrap gap-2 items-center">
+          <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-xs font-semibold">
+            Drop-ins: Sat–Mon 8:00am–8:30pm • Tue–Fri 6:30pm–8:30pm
+          </span>
+        </div>
+        <div className="mt-2 flex flex-wrap gap-2 items-center">
+          <span className="px-2 py-0.5 rounded-full bg-violet-50 text-violet-700 text-xs font-semibold">
+            Overnight: Fri 6:00pm → Mon 11:59pm
+          </span>
+        </div>
+        <div className="mt-2 flex flex-wrap gap-2 items-center">
+          <span className="px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 text-xs font-semibold">
+            Add-ons: Sat–Mon 8:00am–8:30pm • Tue–Fri 6:30pm–8:30pm
+          </span>
         </div>
       </div>
+
+      {/* Month controls */}
+      <div className="rounded-xl border border-gray-200 bg-white p-3 shadow-sm flex justify-center md:justify-start items-center gap-4 mt-2 text-center md:text-left">
+        <button
+          className="btn-ghost text-sm px-3 py-1.5"
+          onClick={() => setCursor((d) => addMonths(d, -1))}
+          aria-label="Previous month"
+        >
+          ←
+        </button>
+        <div className="text-base font-semibold">{format(cursor, 'MMMM yyyy')}</div>
+        <button
+          className="btn-ghost text-sm px-3 py-1.5"
+          onClick={() => setCursor((d) => addMonths(d, 1))}
+          aria-label="Next month"
+        >
+          →
+        </button>
+      </div>
+
 
       {/* Calendar grid */}
       <div className="rounded-2xl border border-gray-200 bg-white p-2 shadow-sm">
@@ -219,9 +207,9 @@ export default function AvailabilityCalendar() {
             <div key={i} className="contents">
               {row.map((d) => {
                 const inMonth = d.getMonth() === cursor.getMonth();
-                // Determine if the *whole day* is fully booked
+                // Whole-day fully booked?
                 const slots = buildSlotsFor(d);
-                const allTaken = slots.every((hm) => {
+                const allTaken = slots.length > 0 && slots.every((hm) => {
                   const [H, M] = hm.split(':').map(Number);
                   const x = new Date(d);
                   x.setHours(H, M, 0, 0);
@@ -256,11 +244,14 @@ export default function AvailabilityCalendar() {
       <div id="slots" className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
         {selected ? (
           <>
-            <h2 className="text-sm font-semibold mb-3">
+            <h2 className="text-sm font-semibold mb-3 text-center md:text-left">
               {format(selected, 'EEEE, MMM d')}
-              {loading && <span className="ml-2 text-xs text-gray-400">(refreshing…)</span>}
+              {loading && (
+                <span className="ml-2 text-xs text-gray-400">(refreshing…)</span>
+              )}
             </h2>
-            <div className="flex flex-wrap gap-2">
+
+            <div className="flex flex-wrap gap-2 justify-center md:justify-start">
               {daySlots.map(({ hm, iso, isBooked }) => (
                 <button
                   key={iso}
@@ -270,7 +261,7 @@ export default function AvailabilityCalendar() {
                     'px-4 py-2 rounded-xl text-sm border transition',
                     isBooked
                       ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'
-                      : 'bg-white hover:bg-brand/5 border-gray-200'
+                      : 'bg-white hover:bg-brand/5 border-gray-200',
                   ].join(' ')}
                 >
                   {format(new Date(iso), 'h:mm a')}
@@ -282,9 +273,12 @@ export default function AvailabilityCalendar() {
             </div>
           </>
         ) : (
-          <p className="text-sm text-gray-600">Select a date to view available times.</p>
+          <p className="text-sm text-gray-600 text-center md:text-left">
+            Select a date to view available times.
+          </p>
         )}
       </div>
+
     </section>
   );
 }
