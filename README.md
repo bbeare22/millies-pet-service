@@ -1,6 +1,6 @@
 # 🐾 Millie's Pet Service
 
-Live Demo: 🌐 millies-pet-service.vercel.app
+Live Demo: 🌐 [millies-pet-service.vercel.app](https://millies-pet-service.vercel.app)
 
 A modern, mobile-friendly booking website for **Millie’s Pet Service** — a local dog walking and pet care business.  
 Customers can browse services, check pricing and availability, and request bookings directly from the site with instant email/text notifications for the owner.
@@ -110,5 +110,6 @@ MIT © 2025 — Developed by [Brett Beare](https://github.com/bbeare22)
 Designed for **Millie’s Pet Service** 🐾
 
 ---
+
 
 ### 🐕 “Because every tail deserves a happy wag.”
