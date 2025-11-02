@@ -1,5 +1,7 @@
 # 🐾 Millie's Pet Service
 
+Live Demo: 🌐 millies-pet-service.vercel.app
+
 A modern, mobile-friendly booking website for **Millie’s Pet Service** — a local dog walking and pet care business.  
 Customers can browse services, check pricing and availability, and request bookings directly from the site with instant email/text notifications for the owner.
 
