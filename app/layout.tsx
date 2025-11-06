@@ -38,10 +38,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="font-body bg-bg text-text">
         <Nav />
-        {/* Add bottom padding so the sticky bar doesn't overlap content on small screens */}
         <main className="container pb-20 md:pb-0">{children}</main>
         <Footer />
-        {/* Mobile-only sticky booking bar */}
       </body>
     </html>
   );
