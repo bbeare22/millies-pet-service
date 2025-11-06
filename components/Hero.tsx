@@ -14,11 +14,11 @@ export default function Hero() {
           </p>
 
           <div className="mt-5 grid grid-cols-2 gap-3 sm:flex sm:flex-wrap justify-center md:justify-start">
-            <Link href="/book" className="btn w-full sm:w-auto text-center">
-              Book Now
-            </Link>
-            <Link href="/services" className="btn-ghost w-full sm:w-auto text-center">
+            <Link href="/services" className="btn w-full sm:w-auto text-center">
               View Services
+            </Link>
+            <Link href="/contact" className="btn-ghost w-full sm:w-auto text-center">
+              Contact
             </Link>
           </div>
 

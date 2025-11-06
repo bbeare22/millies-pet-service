@@ -6,10 +6,8 @@ import { useState } from 'react';
 const links = [
   { href: '/', label: 'Home' },
   { href: '/services', label: 'Services & Pricing' },
-  { href: '/availability', label: 'Availability' },
-  { href: '/book', label: 'Book Now' },
+  { href: '/policies', label: 'Policies' },
   { href: '/contact', label: 'Contact' },
-  { href: '/admin', label: 'Admin' } 
 ];
 
 export default function Nav() {
@@ -17,17 +15,20 @@ export default function Nav() {
   const [open, setOpen] = useState(false);
 
   return (
-    <header className="border-b border-gray-200 bg-white/70 backdrop-blur sticky top-0 z-50 overflow-hidden">
+    <header className="border-b border-gray-200 bg-white/70 backdrop-blur sticky top-0 z-50">
       <div className="container flex items-center justify-between h-16 px-3">
-        {/* Logo */}
         <Link href="/" className="flex items-center gap-2">
-          <img
-            src="/millies-logo.png"
-            alt="Millie's Pet Service"
-            className="object-contain"
-            style={{ height: '64px', width: 'auto', marginBottom: '-6px' }}
-          />
-        </Link>
+  <img
+    src="/millies-logo.png"
+    alt="Millie's Pet Service LLC"
+    className="h-12 w-12 md:h-14 md:w-14 rounded-full object-cover border border-gray-200 shadow-sm"
+    style={{ marginBottom: "0" }}
+  />
+  <span className="hidden sm:inline font-semibold text-brand-dark text-lg tracking-tight">
+    Millie’s Pet Service LLC
+  </span>
+</Link>
+
 
         {/* Desktop Nav */}
         <nav className="hidden md:flex items-center gap-3">
@@ -59,7 +60,7 @@ export default function Nav() {
         </button>
       </div>
 
-      {/* Mobile Menu */}
+      {/* Mobile Dropdown */}
       {open && (
         <div className="md:hidden border-t border-gray-200 bg-white">
           <nav className="container py-2 flex flex-col">

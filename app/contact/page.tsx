@@ -1,87 +1,82 @@
-import Image from 'next/image';
-import contactHero from '@/public/images/contact-hero.png';
+import Image from "next/image";
+import ContactForm from '@/components/ContactForm';
 
-export const metadata = {
-  title: 'Contact',
-  description: "Get in touch with Millie's Pet Service",
-};
+export const metadata = { title: "Contact" };
 
 export default function ContactPage() {
   return (
-    <div className="py-10 space-y-8">
-      {/* Contact Details on Top */}
-      <section className="card text-center md:text-left">
-        <h1 className="text-2xl font-bold mb-1">Contact Millie</h1>
-
-        {/* Slogan with animated heart */}
-        <p className="text-pink-600 font-semibold text-lg mb-4 flex items-center justify-center md:justify-start gap-2">
-          Love &amp; Cuddles are FREE!
-          <span
-            aria-hidden="true"
-            className="inline-block animate-pulse text-red-500 text-xl"
-          >
-            ❤️
-          </span>
+    <section className="py-10 md:py-12">
+      <div className="container space-y-6">
+        <h1 className="text-3xl md:text-4xl font-extrabold text-center md:text-left">Contact</h1>
+        <p className="text-gray-600 text-center md:text-left">
+          Have questions or want to schedule a meet-and-greet? Reach out below.
         </p>
 
-        <p className="text-gray-600 mb-3">
-          Questions about services or availability? Send a message and we’ll get back to you ASAP.
-        </p>
-        <ul className="space-y-1 text-sm text-gray-700">
-          <li>
-            <span className="font-semibold">Email:</span>{' '}
-            <a className="underline hover:no-underline" href="mailto:mpetserv@gmail.com">
-              mpetserv@gmail.com
-            </a>
-          </li>
-          <li>
-            <span className="font-semibold">Booking:</span>{' '}
-            <a className="underline hover:no-underline" href="/book">Request a booking</a>
-          </li>
-        </ul>
-      </section>
+        <div className="grid md:grid-cols-2 gap-6">
 
-      {/* Photo + Form side by side */}
-      <section className="grid gap-6 md:grid-cols-2 items-stretch">
-        {/* Illustration */}
-        <div className="relative w-full h-[400px] overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm flex items-center justify-center">
-          <Image
-            src={contactHero}
-            alt="Friendly dog and cat illustration"
-            fill
-            priority
-            sizes="(max-width: 768px) 100vw, 50vw"
-            className="object-contain p-8"
-          />
-        </div>
-
-        {/* Message form */}
-        <div className="card flex flex-col justify-between h-full">
-          <form
-            action="https://formspree.io/f/your-endpoint"
-            method="POST"
-            className="space-y-4 flex-grow"
-          >
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div>
-                <label htmlFor="name" className="label">Name</label>
-                <input id="name" name="name" className="input min-h-12" required />
-              </div>
-              <div>
-                <label htmlFor="email" className="label">Email</label>
-                <input id="email" name="email" type="email" className="input min-h-12" required />
-              </div>
-            </div>
-
+          <div className="card space-y-4">
             <div>
-              <label htmlFor="message" className="label">Message</label>
-              <textarea id="message" name="message" rows={6} className="input" required />
+              <h2 className="font-semibold">Get in touch</h2>
+              <div className="mt-2 text-sm">
+                <div className="flex items-center gap-2">
+                  <span>📞</span>
+                  <a className="underline" href="tel:+17197614151">(719) 761-4151 (text or call)</a>
+                </div>
+                <div className="flex items-center gap-2 mt-2">
+                  <span>✉️</span>
+                  <a className="underline" href="mailto:hello@mpetserv.com">mpetserv@gmail.com</a>
+                </div>
+              </div>
             </div>
 
-            <button className="btn w-full sm:w-auto" type="submit">Send Message</button>
-          </form>
+            <div className="rounded-xl border border-gray-200 bg-white p-3">
+              <h3 className="font-medium">Notes</h3>
+              <ul className="mt-2 space-y-1 text-sm text-gray-700">
+                <li><strong>Hours of service:</strong> Friday 6:00pm – Monday 8:30pm</li>
+                <li><strong>Sitting:</strong> please contact Millie to confirm sitting times and availability.</li>
+              </ul>
+            </div>
+
+            <div className="rounded-xl border border-gray-200 bg-white p-3">
+              <h3 className="font-medium">Accepted Payments</h3>
+              <div className="mt-2 flex flex-wrap gap-2 text-sm">
+                <span className="px-2 py-1 rounded-xl border">Zelle</span>
+                <span className="px-2 py-1 rounded-xl border">PayPal</span>
+                <span className="px-2 py-1 rounded-xl border">Venmo</span>
+                <span className="px-2 py-1 rounded-xl border">Apple Pay</span>
+              </div>
+            </div>
+
+            <ContactForm />
+
+            <div className="text-pink-600 text-sm font-semibold flex items-center gap-1">
+              <span className="animate-pulse text-2xl leading-none">♥</span>
+              Love &amp; Cuddles are FREE!
+              </div>
+          </div>
+
+          <div className="card overflow-hidden">
+            <div className="relative w-full aspect-[4/3] bg-gray-100">
+              <Image
+                src="/images/contact-hero.png"
+                alt="Millie with pets"
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 100vw, 50vw"
+                priority
+              />
+            </div>
+      
+            <div className="mt-12 mb-10 flex justify-center">
+              <img
+                src="/millies-logo.png"
+                alt="Millie's Pet Service LLC logo"
+                className="h-40 w-40 sm:h-56 sm:w-56 md:h-[20rem] md:w-[20rem] lg:h-[22rem] lg:w-[22rem] rounded-full object-cover border border-gray-300 shadow-lg"
+              />
+            </div>
+          </div>
         </div>
-      </section>
-    </div>
+      </div>
+    </section>
   );
 }
