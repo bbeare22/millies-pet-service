@@ -1,6 +1,6 @@
 # 🐾 Millie's Pet Service LLC
 
-🌐 **Live Demo:** [mpetserv.com](https://mpetserv.com)
+🌐 **Live Demo:** [millies-pet-service.vercel.app](https://millies-pet-service.vercel.app)
 
 A modern, mobile-friendly website for **Millie’s Pet Service LLC** — a local dog walking and pet care business in Colorado Springs.  
 Visitors can explore services, view policies, and contact Millie directly via a simple message form that sends inquiries straight to her email.
