@@ -1,9 +1,9 @@
-# 🐾 Millie's Pet Service
+# 🐾 Millie's Pet Service LLC
 
-Live Demo: 🌐 [millies-pet-service.vercel.app](https://millies-pet-service.vercel.app)
+🌐 **Live Demo:** [mpetserv.com](https://mpetserv.com)
 
-A modern, mobile-friendly booking website for **Millie’s Pet Service** — a local dog walking and pet care business.  
-Customers can browse services, check pricing and availability, and request bookings directly from the site with instant email/text notifications for the owner.
+A modern, mobile-friendly website for **Millie’s Pet Service LLC** — a local dog walking and pet care business in Colorado Springs.  
+Visitors can explore services, view policies, and contact Millie directly via a simple message form that sends inquiries straight to her email.
 
 ![Millie's Pet Service Preview](public/millies-logo.png)
 
@@ -11,54 +11,42 @@ Customers can browse services, check pricing and availability, and request booki
 
 ## 🌟 Features
 
-- 📱 **Responsive Design** — looks great on phones, tablets, and desktops  
-- 🗓️ **Online Booking Form** — customers can request walks or overnight stays  
-- 💬 **Email + SMS Notifications** — real-time updates for new bookings  
-- 💾 **Prisma + SQLite (Postgres-ready)** — persistent data storage  
-- 🎨 **TailwindCSS Styling** — clean, modern, and accessible design  
-- 🐶 **Sticky Mobile “Book Now” Bar** — easy one-tap booking on phones  
-- 🔒 **Environment-based Config** — safe credentials and database separation  
+- 📱 **Fully Responsive Design** — optimized for phones, tablets, and desktops
+- 🐶 **Services & Pricing Section** — clear breakdown of walks, drop-ins, and sitting
+- 📋 **Policies Page** — detailed info on vaccinations, cancellations, payments & more
+- 💌 **Contact Form (Formspree)** — messages go directly to Millie’s inbox
+- ❤️ **Animated Branding** — pulsing heart accent and round logo integration
+- 🎨 **TailwindCSS Styling** — clean, modern, and mobile-first design
+- ⚡ **Static, Fast, and Secure** — lightweight Next.js site with zero backend required
 
 ---
 
 ## 🧰 Tech Stack
 
-- **Framework:** [Next.js 14](https://nextjs.org) (App Router)  
-- **Styling:** [TailwindCSS](https://tailwindcss.com)  
-- **ORM:** [Prisma](https://www.prisma.io/)  
-- **Database:** SQLite (local) → Postgres or Turso (production)  
-- **Email/SMS:** Nodemailer + Twilio (optional)  
-- **Deployment:** [Vercel](https://vercel.com)  
+- **Framework:** [Next.js 14](https://nextjs.org) (App Router)
+- **Styling:** [TailwindCSS](https://tailwindcss.com)
+- **Form Handling:** [Formspree](https://formspree.io)
+- **Deployment:** [Vercel](https://vercel.com)
+- **Email:** Formspree-based submission to business inbox
 
 ---
 
 ## 🚀 Local Setup
 
-1. **Clone the repo**
+1. **Clone the repository**
+
    ```bash
    git clone https://github.com/bbeare22/millies-pet-service.git
    cd millies-pet-service
    ```
 
 2. **Install dependencies**
+
    ```bash
    npm install
    ```
 
-3. **Set up your environment**
-   ```bash
-   cp .env.example .env
-   ```
-   Update `.env` with your local database and any email/SMS credentials.
-
-4. **Generate and seed Prisma**
-   ```bash
-   npx prisma generate
-   npx prisma db push
-   npm run seed
-   ```
-
-5. **Run the dev server**
+3. **Run the development server**
    ```bash
    npm run dev
    ```
@@ -70,46 +58,63 @@ Customers can browse services, check pricing and availability, and request booki
 
 ```
 .
-├── app/                  # Next.js app router pages
-├── components/           # Reusable UI components
-│   ├── Nav.tsx
+├── app/                    # Next.js app router pages
+│   ├── contact/            # Contact form + info card
+│   ├── policies/           # Policies and guidelines
+│   ├── services/           # Services & pricing
+│   └── page.tsx            # Home (hero + featured services)
+├── components/             # Reusable UI components
+│   ├── Nav.tsx             # Top navigation bar
 │   ├── Footer.tsx
-│   ├── BookingForm.tsx
-│   └── StickyBookBar.tsx
-├── prisma/               # Database schema and seed
-├── public/               # Static assets (logo, favicon, images)
-└── styles/               # Global styles (Tailwind)
+│   ├── ContactForm.tsx
+│   └── ServiceList.tsx
+├── public/                 # Static assets (logo, images)
+└── styles/                 # Global Tailwind styles
 ```
+
+---
+
+## 🧾 Recent Updates (2025-11)
+
+- ✂️ Removed booking, admin, and database features
+- 🐾 Added **Policies** page for transparency and trust
+- 💬 Integrated **Formspree contact form** with live email delivery
+- 🖼️ Redesigned **logo** (round format with full business name)
+- 💓 Added animated pulsing heart and responsive logo sizing
+- 🎨 Improved responsive layouts and text alignment
+- 🧹 Cleaned up environment and dependency files for simplicity
 
 ---
 
 ## 📦 Deployment
 
-1. Push the repository to **GitHub**
-2. Connect it to **Vercel**
-3. Add environment variables:
-   - `DATABASE_URL`
-   - `SMTP_*` or `TWILIO_*` (optional)
-4. Deploy — Vercel will auto-build and host the site.
+1. Push your latest changes to **GitHub**
+
+   ```bash
+   git add -A
+   git commit -m "Update: simplified static site with policies, contact form, and new branding"
+   git push origin main
+   ```
+
+2. Connect to **Vercel**  
+   Vercel automatically detects your Next.js app and builds it on each push.
 
 ---
 
-## 💡 Roadmap
+## 💡 Future Enhancements
 
-- [ ] Add owner dashboard for managing bookings  
-- [ ] Integrate Google Calendar sync  
-- [ ] Add image gallery & testimonials  
-- [ ] Deploy production DB (Neon or Turso)  
-- [ ] SEO + analytics polish  
+- [ ] Add gallery or testimonial section
+- [ ] Add FAQ for new clients
+- [ ] Add appointment confirmation emails
+- [ ] SEO optimization & Google Maps integration
 
 ---
 
 ## 📄 License
 
 MIT © 2025 — Developed by [Brett Beare](https://github.com/bbeare22)  
-Designed for **Millie’s Pet Service** 🐾
+Designed for **Millie’s Pet Service LLC** 🐾
 
 ---
 
-
-### 🐕 “Because every tail deserves a happy wag.”
+> “Because every tail deserves a happy wag.” 💕
