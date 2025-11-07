@@ -24,7 +24,7 @@ export default function ContactPage() {
                 </div>
                 <div className="flex items-center gap-2 mt-2">
                   <span>✉️</span>
-                  <a className="underline" href="mailto:hello@mpetserv.com">mpetserv@gmail.com</a>
+                  <a className="underline" href="mailto:mpetserv@gmail.com">mpetserv@gmail.com</a>
                 </div>
               </div>
             </div>
@@ -33,7 +33,7 @@ export default function ContactPage() {
               <h3 className="font-medium">Notes</h3>
               <ul className="mt-2 space-y-1 text-sm text-gray-700">
                 <li><strong>Hours of service:</strong> Friday 6:00pm – Monday 8:30pm</li>
-                <li><strong>Sitting:</strong> please contact Millie to confirm sitting times and availability.</li>
+                <li><strong>Sitting Hours:</strong> Please contact Millie to confirm sitting times and availability.</li>
               </ul>
             </div>
 

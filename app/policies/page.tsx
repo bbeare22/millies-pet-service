@@ -50,6 +50,39 @@ export default function PoliciesPage() {
           </ul>
         </div>
 
+        {/* Medications */}
+        <div className="rounded-2xl border p-5">
+          <h2 className="text-xl font-semibold">Medications</h2>
+          <ul className="mt-3 list-disc pl-5 text-gray-700 space-y-1">
+            <li>
+              <strong>Original vet-prescribed bottle only.</strong> All medication must be in the container
+              dispensed by your veterinarian with the pet’s name, medication name, strength, and clear
+              dosing instructions.
+            </li>
+            <li>
+              We cannot accept medications that are <em>pre-bagged</em>, mixed into food in advance, or placed in
+              <em> Ziploc bags</em>. No exceptions.
+            </li>
+            <li>
+              Provide the exact <strong>dose and schedule</strong> (AM/PM or specific time window). We cannot alter
+              a dosage or frequency without written veterinary direction.
+            </li>
+            <li>
+              Refrigerated meds are okay—please let us know and supply any needed syringes/pill pockets.
+            </li>
+            <li>
+              For everyone’s safety, we cannot administer controlled substances without a written vet order.
+            </li>
+            <li>
+              Medication will be given within a reasonable time window around the requested time (traffic/weather permitting).
+            </li>
+          </ul>
+          <p className="mt-3 text-sm text-gray-600">
+            Tip: Send a photo of the prescription label before your visit so we can confirm details.
+          </p>
+        </div>
+
+
         {/* Behavior */}
         <div className="rounded-2xl border p-5">
           <h2 className="text-xl font-semibold">Behavior</h2>

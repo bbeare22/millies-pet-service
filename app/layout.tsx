@@ -1,28 +1,32 @@
-import './globals.css';
-import Nav from '@/components/Nav';
-import Footer from '@/components/Footer';
-
+import "./globals.css";
+import Nav from "@/components/Nav";
+import Footer from "@/components/Footer";
 
 export const metadata = {
-  title: "Millie's Pet Service",
+  metadataBase: new URL("https://mpetserv.com"),
+  title: {
+    default: "Millie’s Pet Service LLC",
+    template: "%s • Millie’s Pet Service LLC",
+  },
   description: "Loving, reliable care for your best friend.",
-  metadataBase: new URL('https://mpetserv.com'),
+  alternates: {
+    canonical: "/",
+  },
   openGraph: {
-    title: "Millie's Pet Service",
+    type: "website",
+    url: "/",
+    siteName: "Millie’s Pet Service LLC",
+    title: "Millie’s Pet Service LLC",
     description: "Loving, reliable care for your best friend.",
-    url: 'https://mpetserv.com',
-    siteName: "Millie's Pet Service",
-    images: [{ url: '/og.png', width: 1200, height: 630, alt: "Millie's Pet Service" }],
-    type: 'website',
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "Millie’s Pet Service LLC" }],
   },
   twitter: {
-    card: 'summary_large_image',
-    title: "Millie's Pet Service",
+    card: "summary_large_image",
+    title: "Millie’s Pet Service LLC",
     description: "Loving, reliable care for your best friend.",
-    images: ['/og.png'],
+    images: ["/og.png"],
   },
 };
-
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (

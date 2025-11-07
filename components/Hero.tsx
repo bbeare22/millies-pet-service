@@ -29,7 +29,6 @@ export default function Hero() {
         <div className="card text-left">
           <ul className="space-y-3 text-gray-700 text-sm sm:text-base">
             <li className="flex gap-3"><span>✅</span> Fully insured & background checked</li>
-            <li className="flex gap-3"><span>✅</span> Real-time booking confirmations</li>
             <li className="flex gap-3"><span>✅</span> Simple, transparent pricing</li>
             <li className="flex gap-3"><span>✅</span> Overnight sitting available</li>
           </ul>
