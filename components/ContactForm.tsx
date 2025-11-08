@@ -71,11 +71,13 @@ export default function ContactForm() {
           id="phone"
           name="phone"
           type="tel"
+          inputMode="tel"
           className="input min-h-12"
           placeholder="(719) 555-1234"
-          pattern="[0-9()+\-.\s]{7,}"
+          title="Please enter a valid phone number"
           required
         />
+
       </div>
 
       <div>
@@ -115,7 +117,7 @@ export default function ContactForm() {
         </p>
       )}
       {status === "idle" && (
-        <p className="text-xs text-gray-500">
+        <p className="text-xs text-gray-500 text-center md:text-left">
           We usually reply within a business day.
         </p>
       )}

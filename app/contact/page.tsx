@@ -13,33 +13,41 @@ export default function ContactPage() {
         </p>
 
         <div className="grid md:grid-cols-2 gap-6">
-
+          {/* Left Column */}
           <div className="card space-y-4">
-            <div>
+            <div className="text-center md:text-left">
               <h2 className="font-semibold">Get in touch</h2>
-              <div className="mt-2 text-sm">
+              <div className="mt-2 text-sm flex flex-col items-center md:items-start">
                 <div className="flex items-center gap-2">
                   <span>📞</span>
-                  <a className="underline" href="tel:+17197614151">(719) 761-4151 (text or call)</a>
+                  <a className="underline" href="tel:+17197614151">
+                    (719) 761-4151 (text or call)
+                  </a>
                 </div>
                 <div className="flex items-center gap-2 mt-2">
                   <span>✉️</span>
-                  <a className="underline" href="mailto:mpetserv@gmail.com">mpetserv@gmail.com</a>
+                  <a className="underline" href="mailto:mpetserv@gmail.com">
+                    mpetserv@gmail.com
+                  </a>
                 </div>
               </div>
             </div>
 
-            <div className="rounded-xl border border-gray-200 bg-white p-3">
+            <div className="rounded-xl border border-gray-200 bg-white p-3 text-center md:text-left">
               <h3 className="font-medium">Notes</h3>
               <ul className="mt-2 space-y-1 text-sm text-gray-700">
-                <li><strong>Hours of service:</strong> Friday 6:00pm – Monday 8:30pm</li>
-                <li><strong>Sitting Hours:</strong> Please contact Millie to confirm sitting times and availability.</li>
+                <li>
+                  <strong>Hours of service:</strong> Friday 6:00pm – Monday 8:30pm
+                </li>
+                <li>
+                  <strong>Sitting Hours:</strong> Please contact Millie to confirm sitting times and availability.
+                </li>
               </ul>
             </div>
 
-            <div className="rounded-xl border border-gray-200 bg-white p-3">
+            <div className="rounded-xl border border-gray-200 bg-white p-3 text-center md:text-left">
               <h3 className="font-medium">Accepted Payments</h3>
-              <div className="mt-2 flex flex-wrap gap-2 text-sm">
+              <div className="mt-2 flex flex-wrap justify-center md:justify-start gap-2 text-sm">
                 <span className="px-2 py-1 rounded-xl border">Zelle</span>
                 <span className="px-2 py-1 rounded-xl border">PayPal</span>
                 <span className="px-2 py-1 rounded-xl border">Venmo</span>
@@ -47,14 +55,16 @@ export default function ContactPage() {
               </div>
             </div>
 
-            <ContactForm />
-
-            <div className="text-pink-600 text-sm font-semibold flex items-center gap-1">
-              <span className="animate-pulse text-2xl leading-none">♥</span>
-              Love &amp; Cuddles are FREE!
+            <div className="text-center md:text-left">
+              <ContactForm />
+              <div className="text-pink-600 text-sm font-semibold flex items-center justify-center md:justify-start gap-1 mt-2">
+                <span className="animate-pulse text-2xl leading-none">♥</span>
+                Love &amp; Cuddles are FREE!
               </div>
+            </div>
           </div>
 
+          {/* Right Column */}
           <div className="card overflow-hidden">
             <div className="relative w-full aspect-[4/3] bg-gray-100">
               <Image
@@ -66,7 +76,7 @@ export default function ContactPage() {
                 priority
               />
             </div>
-      
+
             <div className="mt-12 mb-10 flex justify-center">
               <img
                 src="/millies-logo.png"

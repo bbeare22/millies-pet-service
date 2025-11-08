@@ -53,7 +53,7 @@ export default function PoliciesPage() {
         {/* Medications */}
         <div className="rounded-2xl border p-5">
           <h2 className="text-xl font-semibold">Medications</h2>
-          <ul className="mt-3 list-disc pl-5 text-gray-700 space-y-1">
+          <ul className="mt-3 space-y-1 text-gray-700 list-none pl-0 md:list-disc md:pl-5">
             <li>
               <strong>Original vet-prescribed bottle only.</strong> All medication must be in the container
               dispensed by your veterinarian with the pet’s name, medication name, strength, and clear
@@ -81,7 +81,6 @@ export default function PoliciesPage() {
             Tip: Send a photo of the prescription label before your visit so we can confirm details.
           </p>
         </div>
-
 
         {/* Behavior */}
         <div className="rounded-2xl border p-5">
