@@ -2,6 +2,8 @@ import Hero from "@/components/Hero";
 import ServiceCard from "@/components/ServiceCard";
 import { SERVICES } from "@/data/services";
 import Link from "next/link";
+import Gallery from "@/components/Gallery";
+import Reviews from "@/components/Reviews";
 
 export const metadata = {
   title: "Millie’s Pet Service",
@@ -15,6 +17,8 @@ export default function HomePage() {
   return (
     <div className="space-y-12">
       <Hero />
+
+      {/* Popular Services */}
       <section>
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-2xl font-bold text-center md:text-left">Popular Services</h2>
@@ -34,6 +38,16 @@ export default function HomePage() {
             />
           ))}
         </div>
+      </section>
+
+      {/* Gallery */}
+      <section>
+        <Gallery />
+      </section>
+
+      {/* Reviews */}
+      <section>
+        <Reviews />
       </section>
     </div>
   );

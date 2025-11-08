@@ -86,21 +86,6 @@ Visitors can explore services, view policies, and contact Millie directly via a 
 
 ---
 
-## 📦 Deployment
-
-1. Push your latest changes to **GitHub**
-
-   ```bash
-   git add -A
-   git commit -m "Update: simplified static site with policies, contact form, and new branding"
-   git push origin main
-   ```
-
-2. Connect to **Vercel**  
-   Vercel automatically detects your Next.js app and builds it on each push.
-
----
-
 ## 💡 Future Enhancements
 
 - [ ] Add gallery or testimonial section
