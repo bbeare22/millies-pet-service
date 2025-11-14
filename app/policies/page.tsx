@@ -10,6 +10,18 @@ const BUSINESS_PHONE_DISPLAY = "(719) 761-4151";
 const BUSINESS_PHONE_TEL = "+1-719-761-4151";
 const BUSINESS_EMAIL = "mpetserv@gmail.com";
 
+function PawDivider() {
+  return (
+    <div className="flex justify-center my-4">
+      <img
+        src="/paw.png"
+        alt=""
+        className="h-10 w-10 opacity-90 object-contain"
+      />
+    </div>
+  );
+}
+
 export default function PoliciesPage() {
   return (
     <main className="mx-auto max-w-4xl px-6 py-12 text-center md:text-left">
@@ -40,6 +52,8 @@ export default function PoliciesPage() {
           </ul>
         </div>
 
+        <PawDivider />
+
         {/* Health & Safety */}
         <div className="rounded-2xl border p-5">
           <h2 className="text-xl font-semibold">Health &amp; Safety</h2>
@@ -49,6 +63,8 @@ export default function PoliciesPage() {
             <li>We require secure collars/harnesses and up-to-date ID tags or microchips.</li>
           </ul>
         </div>
+
+        <PawDivider />
 
         {/* Medications */}
         <div className="rounded-2xl border p-5">
@@ -82,6 +98,8 @@ export default function PoliciesPage() {
           </p>
         </div>
 
+        <PawDivider />
+
         {/* Behavior */}
         <div className="rounded-2xl border p-5">
           <h2 className="text-xl font-semibold">Behavior</h2>
@@ -91,6 +109,8 @@ export default function PoliciesPage() {
             <li>Leash walks only unless a fully secured yard is available and permitted by you.</li>
           </ul>
         </div>
+
+        <PawDivider />
 
         {/* Scheduling & Cancellations */}
         <div className="rounded-2xl border p-5">
@@ -105,6 +125,8 @@ export default function PoliciesPage() {
           </ul>
         </div>
 
+        <PawDivider />
+
         {/* Payments */}
         <div className="rounded-2xl border p-5">
           <h2 className="text-xl font-semibold">Payments</h2>
@@ -115,6 +137,8 @@ export default function PoliciesPage() {
           </ul>
         </div>
 
+        <PawDivider />
+
         {/* Keys & Home Access */}
         <div className="rounded-2xl border p-5">
           <h2 className="text-xl font-semibold">Keys &amp; Home Access</h2>
@@ -123,6 +147,8 @@ export default function PoliciesPage() {
             <li>We lock doors and gates after each visit and respect your home and privacy.</li>
           </ul>
         </div>
+
+        <PawDivider />
 
         {/* Weather */}
         <div className="rounded-2xl border p-5">
@@ -136,6 +162,8 @@ export default function PoliciesPage() {
           </ul>
         </div>
 
+        <PawDivider />
+
         {/* Photos & Updates */}
         <div className="rounded-2xl border p-5">
           <h2 className="text-xl font-semibold">Photos &amp; Updates</h2>
@@ -144,6 +172,8 @@ export default function PoliciesPage() {
             <li>Photos may be used for private updates only; marketing use requires your permission.</li>
           </ul>
         </div>
+
+        <PawDivider />
 
         {/* Emergencies */}
         <div className="rounded-2xl border p-5">
@@ -157,6 +187,8 @@ export default function PoliciesPage() {
           </ul>
         </div>
 
+        <PawDivider />
+
         {/* Service Area & Holidays */}
         <div className="rounded-2xl border p-5">
           <h2 className="text-xl font-semibold">Service Area &amp; Holidays</h2>
@@ -165,6 +197,8 @@ export default function PoliciesPage() {
             <li>Holiday bookings may have limited availability and/or adjusted rates.</li>
           </ul>
         </div>
+
+        <PawDivider />
 
         {/* Liability & Privacy */}
         <div className="rounded-2xl border p-5">

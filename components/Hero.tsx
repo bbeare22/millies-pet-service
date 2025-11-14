@@ -28,9 +28,25 @@ export default function Hero() {
         {/* RIGHT COLUMN — always left-aligned */}
         <div className="card text-left">
           <ul className="space-y-3 text-gray-700 text-sm sm:text-base">
-            <li className="flex gap-3"><span>✅</span> Fully insured & background checked</li>
-            <li className="flex gap-3"><span>✅</span> Simple, transparent pricing</li>
-            <li className="flex gap-3"><span>✅</span> Overnight sitting available</li>
+            <li className="flex items-center gap-3">
+              <img src="/paw.png" alt="" className="w-6 h-6 object-contain" />
+              Fully insured & background checked
+            </li>
+
+            <li className="flex items-center gap-3">
+              <img src="/paw.png" alt="" className="w-6 h-6 object-contain" />
+              Simple, transparent pricing
+            </li>
+
+            <li className="flex items-center gap-3">
+              <img src="/paw.png" alt="" className="w-6 h-6 object-contain" />
+              Overnight sitting available
+            </li>
+
+            <li className="flex items-center gap-3">
+              <img src="/paw.png" alt="" className="w-6 h-6 object-contain" />
+              Pet CPR Certified
+            </li>
           </ul>
         </div>
       </div>

@@ -5,7 +5,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 type Review = {
   id: string;
   name: string;
-  rating: number; // 1–5
+  rating: number; 
   text: string;
   photoDataUrl?: string;
   createdAt: number;

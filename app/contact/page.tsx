@@ -40,8 +40,9 @@ export default function ContactPage() {
                   <strong>Hours of service:</strong> Friday 6:00pm – Monday 8:30pm
                 </li>
                 <li>
-                  <strong>Sitting Hours:</strong> Please contact Millie to confirm sitting times and availability.
+                  <strong>Sitting Hours:</strong> Friday 6:00pm - Monday 11:59pm
                 </li>
+                <li>Please contact Millie to confirm sitting times and availability.</li>
               </ul>
             </div>
 
