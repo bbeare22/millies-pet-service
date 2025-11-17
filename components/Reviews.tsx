@@ -7,7 +7,7 @@ type Review = {
   name: string;
   rating: number; 
   text: string;
-  photoDataUrl?: string;
+  photoDataUrl?: string | null;
   createdAt: number;
 };
 
@@ -17,33 +17,32 @@ const PRESET_REVIEWS: Review[] = [
     name: 'Hannah M.',
     rating: 5,
     text: 'Millie is wonderful with our shy rescue! Dependable and kind.',
-    createdAt: Date.now() - 1000 * 60 * 60 * 24 * 7, 
+    createdAt: Date.now() - 1000 * 60 * 60 * 24 * 7,
   },
   {
     id: 'r2',
     name: 'Jason P.',
     rating: 5,
     text: 'Great communication and our pup comes home happy and tired!',
-    createdAt: Date.now() - 1000 * 60 * 60 * 24 * 12, 
+    createdAt: Date.now() - 1000 * 60 * 60 * 24 * 12,
   },
   {
     id: 'r3',
     name: 'Emily R.',
     rating: 5,
     text: 'Absolutely love Millie! She treats my dog like family and always goes the extra mile.',
-    createdAt: Date.now() - 1000 * 60 * 60 * 24 * 20, 
-  },  
+    createdAt: Date.now() - 1000 * 60 * 60 * 24 * 20,
+  },
   {
     id: 'r4',
     name: 'Tom & Sarah L.',
     rating: 5,
     text: 'We’ve used several sitters, but Millie is by far the best — super reliable and friendly!',
-    createdAt: Date.now() - 1000 * 60 * 60 * 24 * 25, 
+    createdAt: Date.now() - 1000 * 60 * 60 * 24 * 25,
   },
 ];
 
-
-const LS_KEY = 'millies-reviews-v1';
+const MAX_VISIBLE = 10;
 
 /* --------------------------- StarRating component -------------------------- */
 
@@ -53,7 +52,7 @@ function StarRating({
   size = 'md',
   idBase = 'rating',
 }: {
-  value: number; // 1-5
+  value: number; 
   onChange: (next: number) => void;
   size?: 'sm' | 'md' | 'lg';
   idBase?: string;
@@ -114,7 +113,6 @@ async function fileToResizedDataURL(
   quality = 0.85
 ): Promise<string | undefined> {
   try {
-    // Prefer createImageBitmap if available
     if ('createImageBitmap' in window) {
       const bitmap = await createImageBitmap(file);
       const ratio = bitmap.width > maxWidth ? maxWidth / bitmap.width : 1;
@@ -130,7 +128,6 @@ async function fileToResizedDataURL(
       return canvas.toDataURL('image/jpeg', quality);
     }
 
-    // Fallback: use Image + FileReader
     const dataUrl = await new Promise<string>((resolve, reject) => {
       const fr = new FileReader();
       fr.onload = () => resolve(fr.result as string);
@@ -170,29 +167,50 @@ export default function Reviews() {
   const [text, setText] = useState('');
   const [photo, setPhoto] = useState<File | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [status, setStatus] = useState<'idle' | 'sent' | 'error'>('idle');
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
+  
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem(LS_KEY);
-      const saved = raw ? (JSON.parse(raw) as Review[]) : [];
-      const merged = [...PRESET_REVIEWS, ...saved];
-      setReviews(merged.filter((r) => r.rating >= 4));
-    } catch {
-      setReviews(PRESET_REVIEWS.filter((r) => r.rating >= 4));
-    }
-  }, []);
+    let cancelled = false;
 
-  // Save only user-submitted reviews in LS (not presets)
-  const userReviews = useMemo(
-    () => reviews.filter((r) => !PRESET_REVIEWS.find((p) => p.id === r.id)),
-    [reviews]
-  );
-  useEffect(() => {
-    try {
-      localStorage.setItem(LS_KEY, JSON.stringify(userReviews));
-    } catch {}
-  }, [userReviews]);
+    (async () => {
+      try {
+        const res = await fetch('/api/reviews', { cache: 'no-store' });
+        if (!res.ok) throw new Error('Failed to fetch');
+        const data = (await res.json()) as { reviews?: Review[] };
+
+        const fromServer = (data.reviews ?? []).filter((r) => r.rating >= 4);
+
+        const merged = [...PRESET_REVIEWS, ...fromServer];
+
+        const visible = merged
+          .filter((r) => r.rating >= 4)
+          .sort((a, b) => b.createdAt - a.createdAt)
+          .slice(0, MAX_VISIBLE);
+
+        if (!cancelled) {
+          setReviews(visible);
+        }
+      } catch (err) {
+        console.error('Error loading reviews:', err);
+        const fallback = PRESET_REVIEWS.filter((r) => r.rating >= 4)
+          .sort((a, b) => b.createdAt - a.createdAt)
+          .slice(0, MAX_VISIBLE);
+        if (!cancelled) {
+          setReviews(fallback);
+          setStatus('error');
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   function renderStars(value: number) {
     return (
@@ -203,51 +221,67 @@ export default function Reviews() {
     );
   }
 
+  const visible = useMemo(
+    () => [...reviews].sort((a, b) => b.createdAt - a.createdAt).slice(0, MAX_VISIBLE),
+    [reviews]
+  );
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!name.trim() || !text.trim()) return;
 
     setSubmitting(true);
+    setStatus('idle');
 
     let dataUrl: string | undefined = undefined;
     if (photo) {
       dataUrl = await fileToResizedDataURL(photo, 1200, 0.85);
     }
 
-    const id =
-      typeof crypto !== 'undefined' && 'randomUUID' in crypto
-        ? 'u-' + crypto.randomUUID()
-        : 'u-' + Math.random().toString(36).slice(2);
+    try {
+      const res = await fetch('/api/reviews', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: name.trim(),
+          rating,
+          text: text.trim(),
+          photoDataUrl: dataUrl ?? null,
+        }),
+      });
 
-    const next: Review = {
-      id,
-      name: name.trim(),
-      rating: Math.max(1, Math.min(5, rating)),
-      text: text.trim(),
-      photoDataUrl: dataUrl,
-      createdAt: Date.now(),
-    };
+      if (!res.ok) {
+        throw new Error('Failed to save review');
+      }
 
-    // Add to list (still show only 4–5★), sort newest first
-    setReviews((prev) =>
-      [next, ...prev]
-        .filter((r) => r.rating >= 4)
-        .sort((a, b) => b.createdAt - a.createdAt)
-    );
+      const data = (await res.json()) as { review: Review };
+      const saved = data.review;
 
-    // Reset form
-    setName('');
-    setRating(5);
-    setText('');
-    setPhoto(null);
-    if (fileInputRef.current) fileInputRef.current.value = '';
-    setSubmitting(false);
+      setReviews((prev) => {
+        const nonPreset = prev.filter(
+          (r) => !PRESET_REVIEWS.find((p) => p.id === r.id)
+        );
+        const merged = [...PRESET_REVIEWS, saved, ...nonPreset];
+
+        return merged
+          .filter((r) => r.rating >= 4)
+          .sort((a, b) => b.createdAt - a.createdAt)
+          .slice(0, MAX_VISIBLE);
+      });
+
+      setName('');
+      setRating(5);
+      setText('');
+      setPhoto(null);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+      setStatus('sent');
+    } catch (err) {
+      console.error('Error submitting review:', err);
+      setStatus('error');
+    } finally {
+      setSubmitting(false);
+    }
   }
-
-  const visible = useMemo(
-    () => [...reviews].sort((a, b) => b.createdAt - a.createdAt),
-    [reviews]
-  );
 
   return (
     <section className="space-y-4">
@@ -258,29 +292,37 @@ export default function Reviews() {
 
       {/* Reviews grid */}
       <div className="grid md:grid-cols-2 gap-4">
-        {visible.length === 0 && (
+        {loading && (
+          <div className="rounded-xl border p-4 text-center text-gray-600">
+            Loading reviews…
+          </div>
+        )}
+
+        {!loading && visible.length === 0 && (
           <div className="rounded-xl border p-4 text-center text-gray-600">
             No reviews yet. Be the first to share your experience!
           </div>
         )}
-        {visible.map((r) => (
-          <article key={r.id} className="rounded-xl border bg-white p-4">
-            <div className="flex items-center justify-between">
-              <h4 className="font-semibold">{r.name}</h4>
-              {renderStars(r.rating)}
-            </div>
-            <p className="mt-2 text-sm text-gray-700">{r.text}</p>
-            {r.photoDataUrl && (
-              <div className="mt-3 overflow-hidden rounded-lg border">
-                <img
-                  src={r.photoDataUrl}
-                  alt={`${r.name}'s review photo`}
-                  className="w-full h-40 object-cover"
-                />
+
+        {!loading &&
+          visible.map((r) => (
+            <article key={r.id} className="rounded-xl border bg-white p-4">
+              <div className="flex items-center justify-between">
+                <h4 className="font-semibold">{r.name}</h4>
+                {renderStars(r.rating)}
               </div>
-            )}
-          </article>
-        ))}
+              <p className="mt-2 text-sm text-gray-700">{r.text}</p>
+              {r.photoDataUrl && (
+                <div className="mt-3 overflow-hidden rounded-lg border">
+                  <img
+                    src={r.photoDataUrl}
+                    alt={`${r.name}'s review photo`}
+                    className="w-full h-40 object-cover"
+                  />
+                </div>
+              )}
+            </article>
+          ))}
       </div>
 
       {/* Form */}
@@ -289,7 +331,9 @@ export default function Reviews() {
         <form className="mt-3 grid gap-3" onSubmit={handleSubmit}>
           <div className="grid sm:grid-cols-2 gap-3">
             <div>
-              <label className="label" htmlFor="rev-name">Your Name</label>
+              <label className="label" htmlFor="rev-name">
+                Your Name
+              </label>
               <input
                 id="rev-name"
                 className="input min-h-12 w-full"
@@ -300,7 +344,9 @@ export default function Reviews() {
               />
             </div>
             <div>
-              <label className="label" htmlFor="rev-rating">Rating</label>
+              <label className="label" htmlFor="rev-rating">
+                Rating
+              </label>
               <div className="flex items-center justify-between sm:justify-start gap-3">
                 <StarRating
                   value={rating}
@@ -316,7 +362,9 @@ export default function Reviews() {
           </div>
 
           <div>
-            <label className="label" htmlFor="rev-text">Review</label>
+            <label className="label" htmlFor="rev-text">
+              Review
+            </label>
             <textarea
               id="rev-text"
               className="input w-full"
@@ -329,7 +377,9 @@ export default function Reviews() {
           </div>
 
           <div>
-            <label className="label" htmlFor="rev-photo">Photo (optional)</label>
+            <label className="label" htmlFor="rev-photo">
+              Photo (optional)
+            </label>
             <input
               ref={fileInputRef}
               id="rev-photo"
@@ -351,6 +401,14 @@ export default function Reviews() {
             >
               {submitting ? 'Submitting…' : 'Submit Review'}
             </button>
+            {status === 'sent' && (
+              <p className="text-xs text-green-600">Thank you for your review!</p>
+            )}
+            {status === 'error' && (
+              <p className="text-xs text-red-600">
+                Could not save your review. Please try again.
+              </p>
+            )}
           </div>
         </form>
       </div>
