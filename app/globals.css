@@ -110,3 +110,13 @@ p,
 li {
   overflow-wrap: anywhere;
 }
+
+/* Gallery animation */
+@keyframes gallerySoftFadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
