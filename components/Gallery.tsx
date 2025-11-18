@@ -33,6 +33,13 @@ const items: GalleryItem[] = [
   { id: 'g16', src: '/images/gallery/16.jpg', alt: 'Pet enjoying cuddle time' },
   { id: 'g17', src: '/images/gallery/17.jpg', alt: 'Silly dog moment' },
   { id: 'g18', src: '/images/gallery/18.jpg', alt: 'Calm pup during a visit' },
+
+  { id: 'g19', src: '/images/gallery/19.jpg', alt: 'Playful pup in the yard' },
+  { id: 'g20', src: '/images/gallery/20.jpg', alt: 'Dog snuggling on the couch' },
+  { id: 'g21', src: '/images/gallery/21.jpg', alt: 'Walk with a happy dog' },
+  { id: 'g22', src: '/images/gallery/22.jpg', alt: 'Pet enjoying cuddle time' },
+  { id: 'g23', src: '/images/gallery/23.jpg', alt: 'Silly dog moment' },
+  { id: 'g24', src: '/images/gallery/24.avif', alt: 'Calm pup during a visit' },
 ];
 
 export default function Gallery() {

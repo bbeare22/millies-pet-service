@@ -40,7 +40,7 @@ export default function ContactPage() {
                   <strong>Hours of service:</strong> Friday 6:00pm – Monday 8:30pm
                 </li>
                 <li>
-                  Please contact Millie to confirm sitting times and availability.
+                  <strong>Sitting hours:</strong> Please contact Millie to confirm sitting times and availability.
                 </li>
               </ul>
             </div>
@@ -52,6 +52,7 @@ export default function ContactPage() {
                 <span className="px-2 py-1 rounded-xl border">PayPal</span>
                 <span className="px-2 py-1 rounded-xl border">Venmo</span>
                 <span className="px-2 py-1 rounded-xl border">Apple Pay</span>
+                <span className="px-2 py-1 rounded-xl border">Cash</span>
               </div>
             </div>
 
