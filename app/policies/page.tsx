@@ -131,7 +131,7 @@ export default function PoliciesPage() {
         <div className="rounded-2xl border p-5">
           <h2 className="text-xl font-semibold">Payments</h2>
           <ul className="mt-3 space-y-1 text-gray-700 list-none pl-0 md:list-disc md:pl-5">
-            <li>Accepted: Zelle, PayPal, Venmo, Apple Pay.</li>
+            <li>Accepted: Zelle, PayPal, Venmo, Apple Pay, and Cash.</li>
             <li>Payment is due at or before service start; overnights may require a deposit.</li>
             <li>Additional pets or special care may incur add-on fees as listed on the Services page.</li>
           </ul>
