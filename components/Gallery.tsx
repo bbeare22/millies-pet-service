@@ -13,20 +13,14 @@ const ROTATE_MS = 7000;
 const FADE_MS = 1500;     
 
 const items: GalleryItem[] = [
-  { id: 'g1', src: '/images/gallery/1.avif', alt: 'Happy pup on a walk' },
-  { id: 'g2', src: '/images/gallery/2.avif', alt: 'Cat relaxing at home' },
-  { id: 'g3', src: '/images/gallery/3.avif', alt: 'Two dogs after a drop-in visit' },
-  { id: 'g4', src: '/images/gallery/4.avif', alt: 'Cozy overnight sitting' },
-  { id: 'g5', src: '/images/gallery/5.avif', alt: 'Puppy play time' },
-  { id: 'g6', src: '/images/gallery/6.avif', alt: 'Neighborhood walk' },
-
+  /*
   { id: 'g7', src: '/images/gallery/7.png', alt: 'Dog enjoying outdoor time' },
   { id: 'g8', src: '/images/gallery/8.jpg', alt: 'Cat getting attention during a visit' },
   { id: 'g9', src: '/images/gallery/9.jpg', alt: 'Relaxed pup on the couch' },
   { id: 'g10', src: '/images/gallery/10.jpg', alt: 'Dog and toys during a drop-in' },
   { id: 'g11', src: '/images/gallery/11.jpg', alt: 'Leashed walk around the neighborhood' },
   { id: 'g12', src: '/images/gallery/12.jpg', alt: 'Happy pet after a visit' },
-
+  */
   { id: 'g13', src: '/images/gallery/13.jpg', alt: 'Playful pup in the yard' },
   { id: 'g14', src: '/images/gallery/14.jpg', alt: 'Dog snuggling on the couch' },
   { id: 'g15', src: '/images/gallery/15.jpg', alt: 'Walk with a happy dog' },
@@ -39,7 +33,7 @@ const items: GalleryItem[] = [
   { id: 'g21', src: '/images/gallery/21.jpg', alt: 'Walk with a happy dog' },
   { id: 'g22', src: '/images/gallery/22.jpg', alt: 'Pet enjoying cuddle time' },
   { id: 'g23', src: '/images/gallery/23.jpg', alt: 'Silly dog moment' },
-  { id: 'g24', src: '/images/gallery/24.avif', alt: 'Calm pup during a visit' },
+  { id: 'g24', src: '/images/gallery/24.jpg', alt: 'Calm pup during a visit' },
 ];
 
 export default function Gallery() {

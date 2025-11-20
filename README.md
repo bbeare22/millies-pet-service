@@ -95,16 +95,6 @@ Visitors can explore services, view policies, check the rotating gallery, and co
 
 ---
 
-## 💡 Future Enhancements
-
-- [ ] More advanced gallery layout
-- [ ] Searchable FAQ section
-- [ ] SMS autoresponder for contact form
-- [ ] Lightweight admin page to approve new reviews
-- [ ] SEO polish & OpenGraph gallery images
-
----
-
 ## 📄 License
 
 MIT © 2025 — Developed by **Brett Beare**  
