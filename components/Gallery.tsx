@@ -9,18 +9,10 @@ type GalleryItem = {
 };
 
 const ITEMS_PER_PAGE = 6;
-const ROTATE_MS = 7000;   
-const FADE_MS = 1500;     
+const ROTATE_MS = 7000;
+const FADE_MS = 1500;
 
 const items: GalleryItem[] = [
-  /*
-  { id: 'g7', src: '/images/gallery/7.png', alt: 'Dog enjoying outdoor time' },
-  { id: 'g8', src: '/images/gallery/8.jpg', alt: 'Cat getting attention during a visit' },
-  { id: 'g9', src: '/images/gallery/9.jpg', alt: 'Relaxed pup on the couch' },
-  { id: 'g10', src: '/images/gallery/10.jpg', alt: 'Dog and toys during a drop-in' },
-  { id: 'g11', src: '/images/gallery/11.jpg', alt: 'Leashed walk around the neighborhood' },
-  { id: 'g12', src: '/images/gallery/12.jpg', alt: 'Happy pet after a visit' },
-  */
   { id: 'g13', src: '/images/gallery/13.jpg', alt: 'Playful pup in the yard' },
   { id: 'g14', src: '/images/gallery/14.jpg', alt: 'Dog snuggling on the couch' },
   { id: 'g15', src: '/images/gallery/15.jpg', alt: 'Walk with a happy dog' },
@@ -43,7 +35,6 @@ export default function Gallery() {
 
   const totalPages = Math.max(1, Math.ceil(items.length / ITEMS_PER_PAGE));
 
- 
   useEffect(() => {
     const mq = window.matchMedia?.('(prefers-reduced-motion: reduce)');
     if (mq) {
@@ -54,15 +45,12 @@ export default function Gallery() {
     }
   }, []);
 
- 
   useEffect(() => {
     if (reducedMotion || totalPages <= 1) return;
 
     const id = window.setInterval(() => {
-      
       setIsFadingOut(true);
 
-     
       window.setTimeout(() => {
         setPage((prev) => (prev + 1) % totalPages);
         setIsFadingOut(false);
@@ -73,36 +61,73 @@ export default function Gallery() {
   }, [reducedMotion, totalPages]);
 
   const visibleItems = reducedMotion
-    ? items 
+    ? items
     : items.slice(page * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE + ITEMS_PER_PAGE);
 
   return (
     <section className="space-y-3">
-      <h3 className="text-lg md:text-xl font-bold text-center md:text-left">
-        Gallery
-      </h3>
+      <h3 className="text-lg md:text-xl font-bold text-center md:text-left">Gallery</h3>
       <p className="text-gray-600 text-center md:text-left text-sm">
         A few highlights from walks, drop-ins, and sitting.
       </p>
 
       <div
         className={[
-          'grid grid-cols-2 sm:grid-cols-3 gap-3',
+          'grid grid-cols-2 sm:grid-cols-3 gap-4',
           !reducedMotion ? 'transition-opacity duration-[1500ms]' : '',
-          !reducedMotion && isFadingOut ? 'opacity-0' : '',
-          !reducedMotion && !isFadingOut ? 'opacity-100' : '',
+          isFadingOut ? 'opacity-0' : 'opacity-100',
         ].join(' ')}
       >
         {visibleItems.map((img) => (
           <div
             key={`${img.id}-page-${reducedMotion ? 'all' : page}`}
-            className="rounded-xl overflow-hidden border bg-white transition-transform duration-200 hover:scale-[1.01]"
+            className={[
+              'relative group rounded-2xl overflow-hidden bg-white',
+              'transition-all duration-500',
+              'border',
+            ].join(' ')}
+            style={{
+              borderColor: '#7B6C57',
+              boxShadow:
+                '0 6px 18px rgba(123,108,87,0.40), 0 3px 9px rgba(123,108,87,0.30)',
+            }}
           >
+            {/* Inner frame shadow (subtle) */}
+            <div
+              className="pointer-events-none absolute inset-0 rounded-2xl"
+              style={{
+                boxShadow: 'inset 0 0 18px rgba(0,0,0,0.22)',
+              }}
+            />
+
+            {/* Vignette overlay */}
+            <div
+              className="pointer-events-none absolute inset-0 opacity-60 group-hover:opacity-40 transition-opacity duration-500"
+              style={{
+                background:
+                  'radial-gradient(circle, rgba(0,0,0,0) 55%, rgba(0,0,0,0.35) 100%)',
+              }}
+            />
+
+            {/* Actual Image */}
             <img
               src={img.src}
               alt={img.alt}
               loading="lazy"
-              className="w-full h-40 sm:h-52 md:h-60 object-cover"
+              className={[
+                'w-full h-40 sm:h-52 md:h-60 object-cover',
+                'transition-transform duration-500',
+                'group-hover:scale-[1.04]',
+              ].join(' ')}
+            />
+
+            {/* Stronger hover shadow */}
+            <div
+              className="pointer-events-none absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+              style={{
+                boxShadow:
+                  '0 10px 25px rgba(123,108,87,0.50), 0 6px 14px rgba(123,108,87,0.35)',
+              }}
             />
           </div>
         ))}
