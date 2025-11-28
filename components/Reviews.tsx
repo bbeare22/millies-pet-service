@@ -1,11 +1,12 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
+import Image from 'next/image';
 
 type Review = {
   id: string;
   name: string;
-  rating: number; 
+  rating: number;
   text: string;
   photoDataUrl?: string | null;
   createdAt: number;
@@ -44,7 +45,7 @@ const PRESET_REVIEWS: Review[] = [
 
 const MAX_VISIBLE = 10;
 
-/* --------------------------- StarRating component -------------------------- */
+/* --------------------------- Star Rating --------------------------- */
 
 function StarRating({
   value,
@@ -52,7 +53,7 @@ function StarRating({
   size = 'md',
   idBase = 'rating',
 }: {
-  value: number; 
+  value: number;
   onChange: (next: number) => void;
   size?: 'sm' | 'md' | 'lg';
   idBase?: string;
@@ -62,37 +63,18 @@ function StarRating({
     size === 'lg' ? 'text-3xl' : size === 'sm' ? 'text-lg' : 'text-2xl';
 
   return (
-    <div role="radiogroup" aria-label="Star rating" className="flex items-center gap-1">
+    <div className="flex items-center gap-1">
       {stars.map((star) => {
         const checked = value >= star;
         return (
           <button
             key={star}
             type="button"
-            role="radio"
-            aria-checked={checked}
-            aria-label={`${star} star${star > 1 ? 's' : ''}`}
-            id={`${idBase}-${star}`}
             onClick={() => onChange(star)}
-            onKeyDown={(e) => {
-              if (e.key === 'ArrowRight' || e.key === 'ArrowUp') {
-                e.preventDefault();
-                onChange(Math.min(5, value + 1));
-              } else if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') {
-                e.preventDefault();
-                onChange(Math.max(1, value - 1));
-              }
-            }}
-            className={[
-              'transition-transform',
-              'duration-150',
-              'hover:scale-110',
-              'focus:scale-110',
-              'outline-none',
-            ].join(' ')}
+            className="transition-transform hover:scale-110 focus:scale-110"
           >
             <span
-              className={`${sizeClass} leading-none ${
+              className={`${sizeClass} ${
                 checked ? 'text-yellow-500' : 'text-gray-300'
               }`}
             >
@@ -105,7 +87,7 @@ function StarRating({
   );
 }
 
-/* -------------------------- Image resize helper --------------------------- */
+/* ------------------------ Image Resize Helper ------------------------ */
 
 async function fileToResizedDataURL(
   file: File,
@@ -113,21 +95,6 @@ async function fileToResizedDataURL(
   quality = 0.85
 ): Promise<string | undefined> {
   try {
-    if ('createImageBitmap' in window) {
-      const bitmap = await createImageBitmap(file);
-      const ratio = bitmap.width > maxWidth ? maxWidth / bitmap.width : 1;
-      const targetW = Math.round(bitmap.width * ratio);
-      const targetH = Math.round(bitmap.height * ratio);
-
-      const canvas = document.createElement('canvas');
-      canvas.width = targetW;
-      canvas.height = targetH;
-      const ctx = canvas.getContext('2d');
-      if (!ctx) return undefined;
-      ctx.drawImage(bitmap, 0, 0, targetW, targetH);
-      return canvas.toDataURL('image/jpeg', quality);
-    }
-
     const dataUrl = await new Promise<string>((resolve, reject) => {
       const fr = new FileReader();
       fr.onload = () => resolve(fr.result as string);
@@ -136,29 +103,27 @@ async function fileToResizedDataURL(
     });
 
     const img = await new Promise<HTMLImageElement>((resolve, reject) => {
-      const i = new Image();
+      const i = new window.Image();
       i.onload = () => resolve(i);
       i.onerror = () => reject(new Error('Failed to load image'));
       i.src = dataUrl;
     });
 
     const ratio = img.width > maxWidth ? maxWidth / img.width : 1;
-    const targetW = Math.round(img.width * ratio);
-    const targetH = Math.round(img.height * ratio);
-
     const canvas = document.createElement('canvas');
-    canvas.width = targetW;
-    canvas.height = targetH;
+    canvas.width = img.width * ratio;
+    canvas.height = img.height * ratio;
     const ctx = canvas.getContext('2d');
-    if (!ctx) return undefined;
-    ctx.drawImage(img, 0, 0, targetW, targetH);
+    if (!ctx) return dataUrl;
+
+    ctx.drawImage(img, 0, 0, img.width * ratio, img.height * ratio);
     return canvas.toDataURL('image/jpeg', quality);
   } catch {
     return undefined;
   }
 }
 
-/* --------------------------------- Reviews -------------------------------- */
+/* -------------------------------- Reviews ------------------------------- */
 
 export default function Reviews() {
   const [reviews, setReviews] = useState<Review[]>([]);
@@ -169,39 +134,26 @@ export default function Reviews() {
   const [submitting, setSubmitting] = useState(false);
   const [loading, setLoading] = useState(true);
   const [status, setStatus] = useState<'idle' | 'sent' | 'error'>('idle');
+  const [modalImg, setModalImg] = useState<string | null>(null);
+
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  
   useEffect(() => {
     let cancelled = false;
 
     (async () => {
       try {
         const res = await fetch('/api/reviews', { cache: 'no-store' });
-        if (!res.ok) throw new Error('Failed to fetch');
         const data = (await res.json()) as { reviews?: Review[] };
-
         const fromServer = (data.reviews ?? []).filter((r) => r.rating >= 4);
 
-        const merged = [...PRESET_REVIEWS, ...fromServer];
-
-        const visible = merged
-          .filter((r) => r.rating >= 4)
+        const visible = [...PRESET_REVIEWS, ...fromServer]
           .sort((a, b) => b.createdAt - a.createdAt)
           .slice(0, MAX_VISIBLE);
 
-        if (!cancelled) {
-          setReviews(visible);
-        }
-      } catch (err) {
-        console.error('Error loading reviews:', err);
-        const fallback = PRESET_REVIEWS.filter((r) => r.rating >= 4)
-          .sort((a, b) => b.createdAt - a.createdAt)
-          .slice(0, MAX_VISIBLE);
-        if (!cancelled) {
-          setReviews(fallback);
-          setStatus('error');
-        }
+        if (!cancelled) setReviews(visible);
+      } catch {
+        if (!cancelled) setReviews(PRESET_REVIEWS);
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -212,31 +164,14 @@ export default function Reviews() {
     };
   }, []);
 
-  function renderStars(value: number) {
-    return (
-      <span aria-label={`${value} out of 5 stars`} className="text-yellow-500">
-        {'★'.repeat(value)}
-        <span className="text-gray-300">{'★'.repeat(5 - value)}</span>
-      </span>
-    );
-  }
-
-  const visible = useMemo(
-    () => [...reviews].sort((a, b) => b.createdAt - a.createdAt).slice(0, MAX_VISIBLE),
-    [reviews]
-  );
-
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!name.trim() || !text.trim()) return;
 
     setSubmitting(true);
-    setStatus('idle');
 
     let dataUrl: string | undefined = undefined;
-    if (photo) {
-      dataUrl = await fileToResizedDataURL(photo, 1200, 0.85);
-    }
+    if (photo) dataUrl = await fileToResizedDataURL(photo);
 
     try {
       const res = await fetch('/api/reviews', {
@@ -250,74 +185,108 @@ export default function Reviews() {
         }),
       });
 
-      if (!res.ok) {
-        throw new Error('Failed to save review');
-      }
-
       const data = (await res.json()) as { review: Review };
-      const saved = data.review;
 
-      setReviews((prev) => {
-        const nonPreset = prev.filter(
-          (r) => !PRESET_REVIEWS.find((p) => p.id === r.id)
-        );
-        const merged = [...PRESET_REVIEWS, saved, ...nonPreset];
-
-        return merged
+      setReviews((prev) =>
+        [...PRESET_REVIEWS, data.review, ...prev]
           .filter((r) => r.rating >= 4)
           .sort((a, b) => b.createdAt - a.createdAt)
-          .slice(0, MAX_VISIBLE);
-      });
+          .slice(0, MAX_VISIBLE)
+      );
 
       setName('');
-      setRating(5);
       setText('');
+      setRating(5);
       setPhoto(null);
       if (fileInputRef.current) fileInputRef.current.value = '';
       setStatus('sent');
-    } catch (err) {
-      console.error('Error submitting review:', err);
+    } catch {
       setStatus('error');
     } finally {
       setSubmitting(false);
     }
   }
 
+  /* ---------------------------- Render Stars ---------------------------- */
+
+  function renderStars(value: number) {
+    return (
+      <span className="text-yellow-500">
+        {'★'.repeat(value)}
+        <span className="text-gray-300">{'★'.repeat(5 - value)}</span>
+      </span>
+    );
+  }
+
+  const visible = useMemo(
+    () => [...reviews].sort((a, b) => b.createdAt - a.createdAt),
+    [reviews]
+  );
+
   return (
-    <section className="space-y-4">
-      <h3 className="text-lg md:text-xl font-bold text-center md:text-left">Reviews</h3>
+    <section className="space-y-6">
+
+      {/* Modal */}
+      {modalImg && (
+        <div
+          className="fixed inset-0 bg-black/70 flex items-center justify-center z-50"
+          onClick={() => setModalImg(null)}
+        >
+          <img
+            src={modalImg}
+            className="max-w-[90%] max-h-[90%] rounded-xl shadow-2xl"
+          />
+        </div>
+      )}
+
+      <h3 className="text-xl font-bold text-center md:text-left">Reviews</h3>
       <p className="text-gray-600 text-center md:text-left text-sm">
         Happy pet? Leave a review!
       </p>
 
-      {/* Reviews grid */}
-      <div className="grid md:grid-cols-2 gap-4">
+      {/* Review Cards */}
+      <div className="grid md:grid-cols-2 gap-5">
         {loading && (
           <div className="rounded-xl border p-4 text-center text-gray-600">
             Loading reviews…
           </div>
         )}
 
-        {!loading && visible.length === 0 && (
-          <div className="rounded-xl border p-4 text-center text-gray-600">
-            No reviews yet. Be the first to share your experience!
-          </div>
-        )}
-
         {!loading &&
           visible.map((r) => (
-            <article key={r.id} className="rounded-xl border bg-white p-4">
+            <article
+              key={r.id}
+              className="rounded-xl border border-[#7B6C57]/30 bg-white p-5 shadow-md hover:shadow-lg transition-shadow animate-fadeIn flex flex-col gap-3"
+            >
+              {/* Header */}
               <div className="flex items-center justify-between">
-                <h4 className="font-semibold">{r.name}</h4>
-                {renderStars(r.rating)}
+                <div className="flex items-center gap-3">
+                  <Image
+                    src="/paw.png"
+                    width={32}
+                    height={32}
+                    alt="paw avatar"
+                    className="rounded-full"
+                  />
+                  <h4 className="font-semibold">{r.name}</h4>
+                </div>
+
+                <div className="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full shadow">
+                  {r.rating} ★
+                </div>
               </div>
-              <p className="mt-2 text-sm text-gray-700">{r.text}</p>
+
+              <p className="text-sm text-gray-700 leading-relaxed">{r.text}</p>
+
               {r.photoDataUrl && (
-                <div className="mt-3 overflow-hidden rounded-lg border">
+                <div
+                  className="overflow-hidden rounded-lg border border-[#7B6C57] shadow cursor-pointer hover:scale-[1.01] transition"
+                  onClick={() => setModalImg(r.photoDataUrl!)}
+                >
                   <img
                     src={r.photoDataUrl}
-                    alt={`${r.name}'s review photo`}
-                    className="w-full h-40 object-cover"
+                    alt="review photo"
+                    className="w-full h-44 object-cover"
                   />
                 </div>
               )}
@@ -326,48 +295,32 @@ export default function Reviews() {
       </div>
 
       {/* Form */}
-      <div className="rounded-xl border bg-white p-4">
-        <h4 className="font-semibold text-center md:text-left">Leave a review</h4>
-        <form className="mt-3 grid gap-3" onSubmit={handleSubmit}>
-          <div className="grid sm:grid-cols-2 gap-3">
+      <div className="rounded-xl border border-[#7B6C57]/30 bg-white p-5 shadow-md">
+        <h4 className="font-semibold mb-2">Leave a review</h4>
+
+        <form className="grid gap-4" onSubmit={handleSubmit}>
+          <div className="grid sm:grid-cols-2 gap-4">
             <div>
-              <label className="label" htmlFor="rev-name">
-                Your Name
-              </label>
+              <label className="label">Your Name</label>
               <input
-                id="rev-name"
-                className="input min-h-12 w-full"
+                className="input min-h-12 w-full focus:ring-2 focus:ring-[#7B6C57]/40"
                 placeholder="Jane Doe"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
               />
             </div>
+
             <div>
-              <label className="label" htmlFor="rev-rating">
-                Rating
-              </label>
-              <div className="flex items-center justify-between sm:justify-start gap-3">
-                <StarRating
-                  value={rating}
-                  onChange={(n) => setRating(n)}
-                  size="lg"
-                  idBase="rev-rating"
-                />
-                <span className="text-sm text-gray-600" aria-live="polite">
-                  {rating} / 5
-                </span>
-              </div>
+              <label className="label">Rating</label>
+              <StarRating value={rating} onChange={setRating} size="lg" />
             </div>
           </div>
 
           <div>
-            <label className="label" htmlFor="rev-text">
-              Review
-            </label>
+            <label className="label">Review</label>
             <textarea
-              id="rev-text"
-              className="input w-full"
+              className="input w-full focus:ring-2 focus:ring-[#7B6C57]/40"
               rows={4}
               placeholder="Tell us about your experience!"
               value={text}
@@ -377,15 +330,12 @@ export default function Reviews() {
           </div>
 
           <div>
-            <label className="label" htmlFor="rev-photo">
-              Photo (optional)
-            </label>
+            <label className="label">Photo (optional)</label>
             <input
               ref={fileInputRef}
-              id="rev-photo"
               type="file"
               accept="image/*"
-              className="input h-12 w-full"
+              className="input h-12 w-full focus:ring-2 focus:ring-[#7B6C57]/40"
               onChange={(e) => setPhoto(e.target.files?.[0] ?? null)}
             />
             <p className="text-xs text-gray-500 mt-1">
@@ -393,25 +343,38 @@ export default function Reviews() {
             </p>
           </div>
 
-          <div className="flex items-center gap-3 justify-center sm:justify-start">
-            <button
-              type="submit"
-              className="btn w-full max-w-xs sm:w-auto"
-              disabled={submitting}
-            >
-              {submitting ? 'Submitting…' : 'Submit Review'}
-            </button>
-            {status === 'sent' && (
-              <p className="text-xs text-green-600">Thank you for your review!</p>
-            )}
-            {status === 'error' && (
-              <p className="text-xs text-red-600">
-                Could not save your review. Please try again.
-              </p>
-            )}
-          </div>
+          <button
+            type="submit"
+            className="btn w-full sm:w-auto"
+            disabled={submitting}
+          >
+            {submitting ? 'Submitting…' : 'Submit Review'}
+          </button>
+
+          {status === 'sent' && (
+            <p className="text-xs text-green-600">Thank you for your review!</p>
+          )}
+          {status === 'error' && (
+            <p className="text-xs text-red-600">Unable to submit review.</p>
+          )}
         </form>
       </div>
+
+      {/* Animation */}
+      <style jsx global>{`
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+            transform: translateY(10px);
+          }
+          to {
+            opacity: 1;
+          }
+        }
+        .animate-fadeIn {
+          animation: fadeIn 0.45s ease-out;
+        }
+      `}</style>
     </section>
   );
 }
