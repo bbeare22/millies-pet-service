@@ -7,45 +7,45 @@ export type ServiceItem = {
 };
 
 export const SERVICES: ServiceItem[] = [
-  // Walks
+  // Walks (Up to 2 pets)
   {
     name: "Dog Walk (20 min)",
-    description: "Leashed neighborhood walk. 2 dogs $25.50",
-    price: "$17.00",
+    description: "Leashed neighborhood walk. Up to 2 pets. Additional pets $5.00.",
+    price: "$22.00",
     duration: "20 minutes",
   },
   {
     name: "Dog Walk (30 min)",
-    description: "A brisk 30-minute walk. 2 dogs $39.00",
-    price: "$22.00",
+    description: "A brisk 30-minute walk. Up to 2 pets. Additional pets $5.00.",
+    price: "$26.00",
     duration: "30 minutes",
   },
   {
     name: "Dog Walk (60 min)",
-    description: "Full-hour walk for high-energy pups. 2 dogs $48.00",
-    price: "$32.00",
+    description: "Full-hour walk for high-energy pups. Up to 2 pets. Additional pets $5.00.",
+    price: "$34.00",
     duration: "60 minutes",
   },
 
-  // Drop-ins
+  // Drop-ins (Up to 2 pets)
   {
     name: "Drop-in (20 min)",
     description:
-      "Quick drop-in to make sure dog or cat has fresh water and food. Backyard potty break.",
-    price: "$15.00",
+      "Quick drop-in to refresh water, food, and potty break. Up to 2 pets. Additional pets $3.00.",
+    price: "$20.00",
     duration: "20 minutes",
   },
   {
     name: "Drop-in (30 min)",
     description:
-      "Drop-in with extra time for play and care. Includes water/food top-up and litter pan clean-up.",
-    price: "$20.00",
+      "Drop-in with extra time for attention, play, and clean-up. Up to 2 pets. Additional pets $3.00.",
+    price: "$25.00",
     duration: "30 minutes",
   },
   {
     name: "Drop-in (60 min)",
     description:
-      "Extended drop-in for extra attention and enrichment. Includes water/food top-up and clean-up.",
+      "Extended drop-in for extra enrichment and care. Up to 2 pets. Additional pets $3.00.",
     price: "$30.00",
     duration: "60 minutes",
   },
@@ -54,8 +54,8 @@ export const SERVICES: ServiceItem[] = [
   {
     name: "Sitting (overnight, pet parent’s home)",
     description:
-      "Overnight care in your home. $38 per night. Additional pets $22 each.",
-    price: "$38.00 / night",
+      "Overnight sitting in your home. Up to 2 pets included. Additional pets $10.00 each.",
+    price: "$40.00 / night",
     duration: "Overnight",
   },
 
