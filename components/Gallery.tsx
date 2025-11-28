@@ -13,6 +13,13 @@ const ROTATE_MS = 7000;
 const FADE_MS = 1500;
 
 const items: GalleryItem[] = [
+  { id: 'g7', src: '/images/gallery/7.png', alt: 'Playful pup in the yard' },
+  { id: 'g8', src: '/images/gallery/8.jpg', alt: 'Dog snuggling on the couch' },
+  { id: 'g9', src: '/images/gallery/9.jpg', alt: 'Walk with a happy dog' },
+  { id: 'g10', src: '/images/gallery/10.jpg', alt: 'Pet enjoying cuddle time' },
+  { id: 'g11', src: '/images/gallery/11.jpg', alt: 'Silly dog moment' },
+  { id: 'g12', src: '/images/gallery/12.jpg', alt: 'Calm pup during a visit' },
+
   { id: 'g13', src: '/images/gallery/13.jpg', alt: 'Playful pup in the yard' },
   { id: 'g14', src: '/images/gallery/14.jpg', alt: 'Dog snuggling on the couch' },
   { id: 'g15', src: '/images/gallery/15.jpg', alt: 'Walk with a happy dog' },
