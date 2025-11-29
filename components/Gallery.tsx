@@ -39,6 +39,7 @@ export default function Gallery() {
   const [page, setPage] = useState(0);
   const [reducedMotion, setReducedMotion] = useState(false);
   const [isFadingOut, setIsFadingOut] = useState(false);
+  const [modalImg, setModalImg] = useState<string | null>(null);
 
   const totalPages = Math.max(1, Math.ceil(items.length / ITEMS_PER_PAGE));
 
@@ -72,12 +73,27 @@ export default function Gallery() {
     : items.slice(page * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE + ITEMS_PER_PAGE);
 
   return (
-    <section className="space-y-3">
-      <h3 className="text-lg md:text-xl font-bold text-center md:text-left">Gallery</h3>
+    <section className="space-y-4 animate-fadeIn">
+      {/* Modal matches Reviews.tsx */}
+      {modalImg && (
+        <div
+          onClick={() => setModalImg(null)}
+          className="fixed inset-0 bg-black/70 flex items-center justify-center z-50"
+        >
+          <img
+            src={modalImg}
+            alt="Gallery photo"
+            className="max-w-[90%] max-h-[90%] rounded-xl shadow-2xl"
+          />
+        </div>
+      )}
+
+      <h3 className="text-xl font-bold text-center md:text-left">Gallery</h3>
       <p className="text-gray-600 text-center md:text-left text-sm">
-        A few highlights from walks, drop-ins, and sitting.
+        A few highlights from walks, drop-ins, and sittings.
       </p>
 
+      {/* GRID */}
       <div
         className={[
           'grid grid-cols-2 sm:grid-cols-3 gap-4',
@@ -88,23 +104,22 @@ export default function Gallery() {
         {visibleItems.map((img) => (
           <div
             key={`${img.id}-page-${reducedMotion ? 'all' : page}`}
+            onClick={() => setModalImg(img.src)}
             className={[
-              'relative group rounded-2xl overflow-hidden bg-white',
-              'transition-all duration-500',
-              'border',
+              'relative group rounded-2xl overflow-hidden cursor-pointer',
+              'bg-white border border-[#7B6C57]/30',
+              'shadow-md hover:shadow-lg hover:-translate-y-[2px]',
+              'transition-all duration-300',
             ].join(' ')}
             style={{
-              borderColor: '#7B6C57',
               boxShadow:
-                '0 6px 18px rgba(123,108,87,0.40), 0 3px 9px rgba(123,108,87,0.30)',
+                '0 6px 18px rgba(123,108,87,0.35), 0 3px 9px rgba(123,108,87,0.25)',
             }}
           >
-            {/* Inner frame shadow (subtle) */}
+            {/* Inner frame shadow */}
             <div
               className="pointer-events-none absolute inset-0 rounded-2xl"
-              style={{
-                boxShadow: 'inset 0 0 18px rgba(0,0,0,0.22)',
-              }}
+              style={{ boxShadow: 'inset 0 0 18px rgba(0,0,0,0.22)' }}
             />
 
             {/* Vignette overlay */}
@@ -116,7 +131,7 @@ export default function Gallery() {
               }}
             />
 
-            {/* Actual Image */}
+            {/* IMAGE */}
             <img
               src={img.src}
               alt={img.alt}
@@ -128,12 +143,12 @@ export default function Gallery() {
               ].join(' ')}
             />
 
-            {/* Stronger hover shadow */}
+            {/* Strong hover shadow */}
             <div
               className="pointer-events-none absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
               style={{
                 boxShadow:
-                  '0 10px 25px rgba(123,108,87,0.50), 0 6px 14px rgba(123,108,87,0.35)',
+                  '0 10px 25px rgba(123,108,87,0.5), 0 6px 14px rgba(123,108,87,0.35)',
               }}
             />
           </div>

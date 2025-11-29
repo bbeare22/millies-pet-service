@@ -1,10 +1,7 @@
-import Link from "next/link";
+'use client';
+
 import ServiceCard from "./ServiceCard";
 import { SERVICES } from "@/data/services";
-
-
-const BUSINESS_PHONE_TEL = "+1-719-761-4151";   
-const BUSINESS_EMAIL = "mpetserv@gmail.com";   
 
 export default function ServiceList() {
   const walks   = SERVICES.filter((s) => s.name.startsWith("Dog Walk"));
@@ -16,91 +13,45 @@ export default function ServiceList() {
     (s) => s.name === "Transport" || s.name.toLowerCase().includes("meds")
   );
 
+  const sections = [
+    { title: "Dog Walks", data: walks },
+    { title: "Drop-ins", data: dropins },
+    { title: "Sitting (overnight)", data: sitting },
+    { title: "Add-ons", data: addons },
+  ];
+
   return (
-    <div className="space-y-8">
+    <div className="space-y-12 animate-fadeIn">
+      {sections.map(
+        (section) =>
+          section.data.length > 0 && (
+            <section key={section.title} className="space-y-4">
+              <h3 className="text-xl font-bold text-text/90">
+                {section.title}
+              </h3>
 
-      {/* Dog Walks */}
-      {walks.length > 0 && (
-        <section className="space-y-3">
-          <h3 className="text-lg md:text-xl font-bold text-center md:text-left">
-            Dog Walks
-          </h3>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {walks.map((s) => (
-              <article key={s.name} className="card">
-                <ServiceCard
-                  name={s.name}
-                  description={s.description}
-                  price={s.price}
-                  duration={s.duration}
-                />
-              </article>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* Drop-ins */}
-      {dropins.length > 0 && (
-        <section className="space-y-3">
-          <h3 className="text-lg md:text-xl font-bold text-center md:text-left">
-            Drop-ins
-          </h3>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {dropins.map((s) => (
-              <article key={s.name} className="card">
-                <ServiceCard
-                  name={s.name}
-                  description={s.description}
-                  price={s.price}
-                  duration={s.duration}
-                />
-              </article>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* Sitting (overnight) */}
-      {sitting.length > 0 && (
-        <section className="space-y-3">
-          <h3 className="text-lg md:text-xl font-bold text-center md:text-left">
-            Sitting (overnight)
-          </h3>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {sitting.map((s) => (
-              <article key={s.name} className="card">
-                <ServiceCard
-                  name={s.name}
-                  description={s.description}
-                  price={s.price}
-                  duration={s.duration}
-                />
-              </article>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* Add-ons */}
-      {addons.length > 0 && (
-        <section className="space-y-3">
-          <h3 className="text-lg md:text-xl font-bold text-center md:text-left">
-            Add-ons
-          </h3>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {addons.map((s) => (
-              <article key={s.name} className="card">
-                <ServiceCard
-                  name={s.name}
-                  description={s.description}
-                  price={s.price}
-                  duration={s.duration}
-                />
-              </article>
-            ))}
-          </div>
-        </section>
+              {/* Match the Home Page Popular Services styling */}
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {section.data.map((s) => (
+                  <div
+                    key={s.name}
+                    className={[
+                      "rounded-2xl border border-[#7B6C57]/30 bg-white p-1",
+                      "shadow-md hover:shadow-lg hover:-translate-y-[2px]",
+                      "transition-all duration-300",
+                    ].join(" ")}
+                  >
+                    <ServiceCard
+                      name={s.name}
+                      description={s.description}
+                      price={s.price}
+                      duration={s.duration}
+                    />
+                  </div>
+                ))}
+              </div>
+            </section>
+          )
       )}
     </div>
   );

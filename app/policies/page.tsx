@@ -24,16 +24,16 @@ function PawDivider() {
 
 export default function PoliciesPage() {
   return (
-    <main className="mx-auto max-w-4xl px-6 py-12 text-center md:text-left">
+    <main className="mx-auto max-w-4xl px-6 py-12 text-center md:text-left animate-fadeIn">
       <h1 className="text-3xl font-extrabold">Policies</h1>
       <p className="mt-3 text-gray-600">
         These policies help us provide safe, consistent, and stress-free care. If you have questions,
         please{" "}
-        <a href={`tel:${BUSINESS_PHONE_TEL}`} className="underline">
+        <a href={`tel:${BUSINESS_PHONE_TEL}`} className="underline underline-offset-2 hover:text-[#7B6C57] transition-colors duration-200">
           call/text {BUSINESS_PHONE_DISPLAY}
         </a>{" "}
         or{" "}
-        <a href={`mailto:${BUSINESS_EMAIL}`} className="underline">
+        <a href={`mailto:${BUSINESS_EMAIL}`} className="underline underline-offset-2 hover:text-[#7B6C57] transition-colors duration-200">
           email us
         </a>
         .
@@ -218,7 +218,7 @@ export default function PoliciesPage() {
       </p>
 
       <div className="mt-8">
-        <Link href="/services" className="underline underline-offset-4">
+        <Link href="/services" className="underline underline-offset-4 hover:text-[#7B6C57] transition-colors duration-200">
           View Services &amp; Pricing
         </Link>
       </div>

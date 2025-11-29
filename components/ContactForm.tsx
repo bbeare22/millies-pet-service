@@ -28,7 +28,6 @@ export default function ContactForm() {
     } catch {
       setStatus("error");
     }
-
   }
 
   return (
@@ -44,53 +43,23 @@ export default function ContactForm() {
       />
 
       <div>
-        <label className="label" htmlFor="name">Your Name</label>
-        <input
-          id="name"
-          name="name"
-          className="input min-h-12"
-          placeholder="Jane Doe"
-          required
-        />
+        <label className="label block w-full text-left" htmlFor="name">Your Name</label>
+        <input id="name" name="name" className="input min-h-12" placeholder="Jane Doe" required />
       </div>
 
       <div>
-        <label className="label" htmlFor="email">Email</label>
-        <input
-          id="email"
-          name="email"
-          type="email"
-          className="input min-h-12"
-          placeholder="you@email.com"
-          required
-        />
+        <label className="label block w-full text-left" htmlFor="email">Email</label>
+        <input id="email" name="email" type="email" className="input min-h-12" placeholder="you@email.com" required />
       </div>
 
       <div>
-        <label className="label" htmlFor="phone">Phone Number</label>
-        <input
-          id="phone"
-          name="phone"
-          type="tel"
-          inputMode="tel"
-          className="input min-h-12"
-          placeholder="(719) 555-1234"
-          title="Please enter a valid phone number"
-          required
-        />
-
+        <label className="label block w-full text-left" htmlFor="phone">Phone Number</label>
+        <input id="phone" name="phone" type="tel" inputMode="tel" className="input min-h-12" placeholder="(719) 555-1234" required />
       </div>
 
       <div>
-        <label className="label" htmlFor="message">Message</label>
-        <textarea
-          id="message"
-          name="message"
-          className="input"
-          rows={4}
-          placeholder="Tell us about your pet(s), preferred dates, etc."
-          required
-        />
+        <label className="label block w-full text-left" htmlFor="message">Message</label>
+        <textarea id="message" name="message" className="input" rows={4} placeholder="Tell us about your pet(s), preferred dates, etc." required />
       </div>
 
       <input type="hidden" name="_subject" value="New inquiry from mpetserv.com" />
@@ -114,7 +83,8 @@ export default function ContactForm() {
           ⚠️ Oops! Something went wrong — please try again or email{" "}
           <a href="mailto:mpetserv@gmail.com" className="underline">
             mpetserv@gmail.com
-          </a>.
+          </a>
+          .
         </p>
       )}
       {status === "idle" && (
