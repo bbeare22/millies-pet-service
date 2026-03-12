@@ -47,15 +47,15 @@ export default function ContactPage() {
               </div>
             </div>
 
-            {/* Notes */}
+            {/* Hours of service */}
             <div className="rounded-xl border border-gray-200 bg-white p-3 text-center md:text-left shadow-sm">
               <h3 className="font-medium">Notes</h3>
               <ul className="mt-2 space-y-1 text-sm text-gray-700">
                 <li>
-                  <strong>Hours of service:</strong> Friday 6:00pm – Monday 8:30pm
+                  <strong>Walks and Drop-in's:</strong> Fri, Sat, Sun, Mon (6:00pm - 9:00pm)
                 </li>
                 <li>
-                  <strong>Sitting hours:</strong> Contact Millie to confirm availability.
+                  <strong>Sitting's:</strong> Fri, Sat, Sun, Mon (6:00pm - 11:59pm)
                 </li>
               </ul>
             </div>
