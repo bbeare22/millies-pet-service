@@ -14,9 +14,9 @@ export default function ServiceList() {
   );
 
   const sections = [
-    { title: "Dog Walks", data: walks },
-    { title: "Drop-ins", data: dropins },
-    { title: "Sitting (overnight)", data: sitting },
+    { title: "Dog Walks - Fri, Sat, Sun, Mon (6:00pm - 9:00pm)", data: walks },
+    { title: "Drop-ins - Fri, Sat, Sun, Mon (6:00pm - 9:00pm)", data: dropins },
+    { title: "Sitting (overnight) - Fri, Sat, Sun, Mon (6:00pm - 11:59pm)", data: sitting },
     { title: "Add-ons", data: addons },
   ];
 
