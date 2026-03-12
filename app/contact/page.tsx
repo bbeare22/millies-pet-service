@@ -52,10 +52,10 @@ export default function ContactPage() {
               <h3 className="font-medium">Hours of Service</h3>
               <ul className="mt-2 space-y-1 text-sm text-gray-700">
                 <li>
-                  <strong>Walks and Drop-in's:</strong> Fri, Sat, Sun, Mon (6:00pm - 9:00pm)
+                  <strong>Walks and Drop-in's:</strong> Anytime after 6:00pm on Friday through Monday 9:00pm
                 </li>
                 <li>
-                  <strong>Sitting's:</strong> Fri, Sat, Sun, Mon (6:00pm - 11:59pm)
+                  <strong>Sitting's:</strong> Anytime after 6:00pm on Friday through Monday 11:59pm
                 </li>
               </ul>
             </div>
