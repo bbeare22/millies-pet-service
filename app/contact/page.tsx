@@ -49,7 +49,7 @@ export default function ContactPage() {
 
             {/* Hours of service */}
             <div className="rounded-xl border border-gray-200 bg-white p-3 text-center md:text-left shadow-sm">
-              <h3 className="font-medium">Notes</h3>
+              <h3 className="font-medium">Hours of Service</h3>
               <ul className="mt-2 space-y-1 text-sm text-gray-700">
                 <li>
                   <strong>Walks and Drop-in's:</strong> Fri, Sat, Sun, Mon (6:00pm - 9:00pm)
